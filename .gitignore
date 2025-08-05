@@ -6,8 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-<<<<<<< HEAD
-=======
 # Virtual environments
 venv/
 env/
@@ -21,7 +19,6 @@ __pycache__/
 .env
 
 
->>>>>>> fdbd1ef (Initial clean commit)
 # Distribution / packaging
 .Python
 build/
