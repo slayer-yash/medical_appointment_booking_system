@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 from app.services.logging_services import LoggingService
 from app.models.base_model import BaseModel as Base_Model
-
+from uuid import UUID
 
 logger = LoggingService(__name__).get_logger()
 
@@ -39,3 +39,13 @@ class BasicServices:
             self.db.rollback()
             logger.exception(f"Unexpected error while adding records: {e}")
             raise HTTPException(500, f"Error while adding records to database")
+
+    def get_record_by_id(self, request_id: UUID):
+        '''fetches record by request_id and if record not found, raises not found exception'''
+        logger.debug(f"Fetching {self.model.__name__} with ID {request_id}")
+        record = self.db.query(self.model).filter(self.model.id == request_id).first()
+        if not record:
+            logger.error(f"{self.model.__name__} ID {request_id} not found")
+            raise HTTPException()
+        logger.debug(f"{self.model.__name__} with ID {request_id} fetched successfully")
+        return record
