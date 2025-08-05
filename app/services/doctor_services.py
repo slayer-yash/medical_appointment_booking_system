@@ -2,7 +2,10 @@ from app.services.basic_services import BasicServices
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
+from app.models.doctor_slots import DoctorSlot
 from app.services.logging_services import LoggingService
+from datetime import timedelta, datetime
+
 
 
 logger = LoggingService(__name__).get_logger()
@@ -19,7 +22,7 @@ class DoctorServices(BasicServices):
         
         user_create = UserCreateDBSchema(**user_data)
         logger.debug(F"user_create object initialized: {user_create}")
-        new_user = super().add_records(user_create)
+        new_user = super().add_record(user_create)
         logger.info(f"user added to database, now trying to create doctor profile")
         
         doctor =Doctor(
@@ -34,11 +37,34 @@ class DoctorServices(BasicServices):
         self.db.refresh(doctor)
         logger.info(f"doctor profile added to database")
 
-
+        self.create_doctor_available_slots(doctor)
         
         return new_user
 
-    def create_doctor_available_slots(self, doctor):
-        pass
-    
+    def create_doctor_available_slots(self, doctor, slot_start_time=10, slot_end_time=18):
+        current_day = datetime.today().replace(minute=0, second=0)
+        end_day = current_day+timedelta(days=5)
+        start_day = current_day
+        slots = []
+
+        logger.info(f"Attempting to create slots for doctor")
+        while start_day<=end_day:
+            slot_start = start_day.replace(hour=slot_start_time)
+            last_slot = start_day.replace(hour=slot_end_time-1)
+            while slot_start <= last_slot:
+                slot_end = slot_start+timedelta(hours=1)
+                slot = DoctorSlot(
+                    doctor_id=doctor.id,
+                    start_time=slot_start,
+                    end_time=slot_end
+                )
+                logger.debug(f"Slot created: {slot}")
+                slots.append(slot)
+                slot_start+=timedelta(hours=1)
+            start_day+=timedelta(days=1)
+
+        super().add_records(slots)
+        return slots
+        
+
         

@@ -18,7 +18,7 @@ class NurseServices(BasicServices):
         user_data["role"] = 'nurse'
         user_create = UserCreateDBSchema(**user_data)
         logger.debug(F"user_create object initialized: {user_create}")
-        new_user = super().add_records(user_create)
+        new_user = super().add_record(user_create)
 
         logger.info(f"nurse profile added to database")
         return new_user

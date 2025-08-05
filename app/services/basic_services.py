@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
 from app.services.logging_services import LoggingService
+from app.models.base_model import BaseModel as Base_Model
 
 
 logger = LoggingService(__name__).get_logger()
@@ -10,7 +11,7 @@ class BasicServices:
         self.db = db
         self.model = model
 
-    def add_records(self, py_model: BaseModel):
+    def add_record(self, py_model: BaseModel):
         '''
         adds records to database
         requires: pydantic model that comes from api and role in case of user registration
@@ -28,3 +29,13 @@ class BasicServices:
             self.db.rollback()
             logger.exception(f"Unexpected error while adding record to {self.model.__name__}: {e}")
             raise HTTPException(500, f"Error while adding record to database: {e}")
+
+    def add_records(self, models: list[Base_Model]):
+        try:
+            self.db.add_all(models)
+            self.db.commit()
+            return models
+        except Exception as e:
+            self.db.rollback()
+            logger.exception(f"Unexpected error while adding records: {e}")
+            raise HTTPException(500, f"Error while adding records to database")

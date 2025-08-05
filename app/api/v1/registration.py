@@ -34,7 +34,7 @@ class Registration:
         obj = DoctorServices(db, UserModel)
         response = obj.create_doctor_profile(user)
 
-        # logger.info(f"Customer created: {response.username}, ID: {response.id}")
+        logger.info(f"Doctor profile generated: {response.username}, ID: {response.id}")
         return response
 
 
