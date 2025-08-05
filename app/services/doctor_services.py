@@ -51,7 +51,11 @@ class DoctorServices(BasicServices):
         while start_day<=end_day:
             slot_start = start_day.replace(hour=slot_start_time)
             last_slot = start_day.replace(hour=slot_end_time-1)
+            current_time = datetime.now()
             while slot_start <= last_slot:
+                if slot_start < current_time:
+                    slot_start+=timedelta(hours=1)
+                    continue
                 slot_end = slot_start+timedelta(hours=1)
                 slot = DoctorSlot(
                     doctor_id=doctor.id,
