@@ -24,7 +24,8 @@ class LoggingService():
                 f"{log_dir}/app.log",
                 maxBytes=2 * 1024 * 1024,
                 backupCount= 3,
-                encoding="utf-8"
+                encoding="utf-8",
+                delay=True
                 )
             file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(formatter)

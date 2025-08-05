@@ -140,4 +140,4 @@ class AuthServices(BasicServices):
             raise
         except Exception as e:
             self.db.rollback()
-            raise HTTPException()
+            raise HTTPException(500, "Some error occured")

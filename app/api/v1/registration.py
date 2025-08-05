@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from app.schemas.user import UserDoctorCreateSchema, UserResponseSchema, UserCreateSchema
+from fastapi import APIRouter, Depends, status
+from app.schemas.user import UserDoctorCreateSchema, UserResponseSchema, UserCreateSchema, UserDoctorResponseSchema
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.utils.helper import create_password_hash
@@ -9,6 +9,7 @@ from app.services.patient_services import PatientServices
 from app.services.nurse_services import NurseServices
 from app.services.logging_services import LoggingService
 from app.models.users import User as UserModel
+from app.schemas.api_response import APIResponse
 
 
 logger = LoggingService(__name__).get_logger()
@@ -16,7 +17,7 @@ logger = LoggingService(__name__).get_logger()
 class Registration:
     router = APIRouter(tags=["Registration"])
 
-    @router.post("/doctor", response_model=UserResponseSchema)
+    @router.post("/doctor", response_model=APIResponse[UserDoctorResponseSchema])
     def register_doctor(user: UserDoctorCreateSchema, db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
@@ -35,10 +36,15 @@ class Registration:
         response = obj.create_doctor_profile(user)
 
         logger.info(f"Doctor profile generated: {response.username}, ID: {response.id}")
-        return response
+        return APIResponse[UserDoctorResponseSchema](
+            success=True,
+            status_code=status.HTTP_201_CREATED,
+            message=f"Doctor account registered",
+            data=response
+        )
 
 
-    @router.post("/patient", response_model=UserResponseSchema)
+    @router.post("/patient", response_model=APIResponse[UserResponseSchema])
     def register_patient(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
@@ -57,9 +63,14 @@ class Registration:
         response = obj.create_patient_profile(user)
 
         logger.info(f"Pateint profile generated: {response.username}, ID: {response.id}")
-        return response
+        return APIResponse[UserResponseSchema](
+            success=True,
+            status_code=status.HTTP_201_CREATED,
+            message=f"Patient account registered",
+            data=response
+        )
 
-    @router.post("/nurse", response_model=UserResponseSchema)
+    @router.post("/nurse", response_model=APIResponse[UserResponseSchema])
     def register_nurse(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
@@ -78,4 +89,9 @@ class Registration:
         response = obj.create_nurse_profile(user)
 
         logger.info(f"Nurse profile generated: {response.username}, ID: {response.id}")
-        return response
+        return APIResponse[UserResponseSchema](
+            success=True,
+            status_code=status.HTTP_201_CREATED,
+            message=f"Nurse account registered",
+            data=response
+        )

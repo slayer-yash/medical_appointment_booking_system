@@ -18,7 +18,7 @@ class UserCreateSchema(BaseModel):
         arbitrary_types_allowed = True
 
     @field_validator("username")
-    def validate_name(name):
+    def validate_username(name):
         if len(name) < 2 or len(name) > 50:
             raise HTTPException(422)
         pattern = r"^(?=.*[a-zA-Z])[a-zA-Z0-9_]+$"
@@ -27,7 +27,7 @@ class UserCreateSchema(BaseModel):
         return name
 
     @field_validator("first_name")
-    def validate_name(name):
+    def validate_first_name(name):
         if len(name) < 2 or len(name) > 50:
             raise HTTPException(422)
         if not name.isalpha():
@@ -35,7 +35,7 @@ class UserCreateSchema(BaseModel):
         return name
 
     @field_validator("last_name")
-    def validate_name(name):
+    def validate_last_name(name):
         if name:
             if len(name) < 2 or len(name) > 50:
                 raise HTTPException(422)
@@ -74,8 +74,8 @@ class UserCreateDBSchema(UserCreateSchema):
 
 class UserDoctorCreateSchema(UserCreateSchema):
     speciality: str = Field(min_length=2, max_length=50, examples=["Cardiology"])
-    
 
+    
 
 class UserResponseSchema(BaseModel):
     id: UUID
@@ -88,3 +88,14 @@ class UserResponseSchema(BaseModel):
     class Config:
         from_attributes = True
         arbitrary_types_allowed = True
+
+class DoctorResponseSchema(BaseModel):
+    user_id: UUID
+    speciality: str
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
+
+class UserDoctorResponseSchema(UserResponseSchema):
+    doctor: DoctorResponseSchema
