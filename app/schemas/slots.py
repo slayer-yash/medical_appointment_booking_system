@@ -20,4 +20,8 @@ class AvailableSlotResponseSchema(BaseModel):
         from_attributes = True
         arbitrary_types_allowed = True
 
+class SlotUpdateSchema(BaseModel):
+    is_booked: bool
+    notes: Optional[str] = None
+
 
