@@ -9,6 +9,7 @@ session = Session()
 
 
 get_update_patient_profile = Endpoint(endpoint="/patients/me", methods=["GET", "PATCH"], roles=["patient"])
+get_update_doctor_slots = Endpoint(endpoint="/doctor_slots/me", methods=["GET", "PATCH"], roles=["doctor"])
 
 # session.add()
 # session.commit()
