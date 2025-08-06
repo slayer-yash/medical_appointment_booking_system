@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 
 class AvailableSlotResponseSchema(BaseModel):
+    id:UUID
     doctor_id: UUID
     start_time: datetime
     end_time: datetime

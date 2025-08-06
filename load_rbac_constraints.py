@@ -13,7 +13,7 @@ get_update_doctor_slots = Endpoint(endpoint="/doctor_slots/me", methods=["GET", 
 get_available_doctors = Endpoint(endpoint="/doctors/available", methods=["GET"], roles=["patient"])
 get_doctors = Endpoint(endpoint="/doctors/", methods=["GET"], roles=["patient", "doctor", "nurse"])
 get_doctor_available_slot_by_id = Endpoint(endpoint="/doctors/*/available_slots", methods=["GET"], roles=["patient"])
-
+book_patient_appointment = Endpoint(endpoint="/appointments/book", methods=["POST"], roles=["patient"])
 
 
 # session.add()
