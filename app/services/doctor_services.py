@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
 from app.models.doctor_slots import DoctorSlot
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from datetime import timedelta, datetime
 
 

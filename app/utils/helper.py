@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 import jwt
 from app.config.config import SECRET_KEY, TOKEN_ALGORITHM
 from app.models.users import User
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 
 
 logger = Logging(__name__).get_logger()

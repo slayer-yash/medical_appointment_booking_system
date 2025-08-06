@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from app.models.doctor_slots import DoctorSlot
 from app.models.doctor import Doctor
 from app.services.basic_services import BasicServices
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.utils.helper import get_payload
 import uuid
 

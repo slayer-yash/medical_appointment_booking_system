@@ -1,13 +1,13 @@
 
 from schemas.token import Token
 from fastapi import APIRouter
-from app.services.logging_services import LoggingService
+from app.utils.logging import Logging
 from app.services.auth_service import AuthServices
 from app.db.session import get_db
 from typing import Annotated
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class Appointment():
     router = APIRouter(prefix="/appointments", tags=["Appointment"])

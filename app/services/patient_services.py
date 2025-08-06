@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
 from app.models.users import User
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.utils.helper import get_payload
 
 

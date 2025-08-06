@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 from app.schemas.token import Token
 from fastapi import APIRouter, Depends, status
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.services.auth_service import AuthServices
 from app.services.patient_services import PatientServices
 from app.schemas.api_response import APIResponse

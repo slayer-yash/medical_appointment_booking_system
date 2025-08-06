@@ -4,7 +4,7 @@ from app.schemas.token import Token
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.models.users import User
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.services.auth_service import AuthServices
 from app.schemas.api_response import APIResponse
 from app.db.session import get_db

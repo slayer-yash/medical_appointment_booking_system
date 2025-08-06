@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.models.base_model import BaseModel as Base_Model
 from uuid import UUID
 

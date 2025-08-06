@@ -7,7 +7,7 @@ from app.services.basic_services import BasicServices
 from app.services.doctor_services import DoctorServices
 from app.services.patient_services import PatientServices
 from app.services.nurse_services import NurseServices
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.models.users import User as UserModel
 from app.schemas.api_response import APIResponse
 

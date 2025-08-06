@@ -2,7 +2,7 @@ from app.services.basic_services import BasicServices
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 
 
 logger = Logging(__name__).get_logger()

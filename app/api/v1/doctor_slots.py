@@ -1,7 +1,7 @@
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, status
-from app.utils.Logging import Logging
+from app.utils.logging import Logging
 from app.services.doctor_slots_services import DoctorSlotServices
 from app.schemas.api_response import APIResponse
 from app.schemas.slots import AvailableSlotResponseSchema, SlotUpdateSchema
