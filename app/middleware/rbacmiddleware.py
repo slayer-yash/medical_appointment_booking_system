@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from app.utils.helper import get_payload
 from app.utils.logging import Logging
 from app.config.settings import settings
+from fnmatch import fnmatch
 
 logger = Logging(__name__).get_logger()
 
@@ -60,15 +61,20 @@ class RBACMiddleware(BaseHTTPMiddleware):
                 )
 
             # Ensure user has access for specific endpoint and method from RBAC table
-            end_point = session.query(Endpoint).filter(
+            end_points = session.query(Endpoint).filter(
                 and_(
-                    (Endpoint.endpoint == request_endpoint),
+                    # (Endpoint.endpoint == request_endpoint),
                     (Endpoint.methods.any(request_method)),
                     (Endpoint.roles.any(role))
                 )
-            ).first()
+            ).all()
 
-            if not end_point:
+            access_granted = False
+            for end_point in end_points:
+                if fnmatch(request_endpoint, end_point.endpoint):
+                    access_granted = True
+
+            if not access_granted:
                 logger.warning(f"Access denied for role '{role}' on {request_method} {request_endpoint}")
                 return JSONResponse(
                     status_code=403,
