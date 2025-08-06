@@ -49,3 +49,11 @@ class BasicServices:
             raise HTTPException()
         logger.debug(f"{self.model.__name__} with ID {request_id} fetched successfully")
         return record
+
+    def get_all_records(self):
+
+        logger.info(f"get_all_records called for model: {self.model}")
+        records = self.db.query(self.model).all()
+
+        logger.debug(f"Records fetched: {records}")
+        return records

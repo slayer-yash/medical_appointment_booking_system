@@ -1,3 +1,5 @@
+
+from fastapi import HTTPException
 from app.services.basic_services import BasicServices
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
@@ -5,7 +7,7 @@ from app.models.doctor import Doctor
 from app.models.doctor_slots import DoctorSlot
 from app.utils.logging import Logging
 from datetime import timedelta, datetime
-
+from app.utils.helper import get_payload
 
 
 logger = Logging(__name__).get_logger()
@@ -69,6 +71,19 @@ class DoctorServices(BasicServices):
 
         super().add_records(slots)
         return slots
-        
+    
+    def fetch_doctors(self, token):
+        logger.info(f"fetch_doctors method called")
+        payload = get_payload(token)
 
+        logger.debug(f"payload received: {payload}")
+        user_id = payload.get('user_id')
+        role = payload.get('role')
         
+        # if role != 'patient':
+        #     logger.error(f"role does not match with 'patient', role: {role}")
+        #     raise HTTPException(401, "Only 'patients' can access this method")
+
+        doctors = super().get_all_records()
+        
+        return doctors
