@@ -6,10 +6,10 @@ from app.db.session import local_session
 from app.models.rbac import Endpoint
 from sqlalchemy import and_
 from app.utils.helper import get_payload
-from app.services.logging_services import LoggingService
+from app.utils.logging import Logging
 from app.config.settings import settings
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class RBACMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
