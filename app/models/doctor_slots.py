@@ -9,6 +9,7 @@ class DoctorSlot(BaseModel):
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     is_booked = Column(Boolean, default= False)
+    notes = Column(String, nullable=True)
     
     doctor = relationship("Doctor", back_populates="available_slots")
     appointment = relationship("Appointment", back_populates="slot", uselist=False)
