@@ -19,7 +19,7 @@ class DoctorSlots():
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
     router = APIRouter(prefix="/doctor_slots", tags=["Doctor Slots"])
 
-    @router.get("/me", response_model=APIResponse[AvailableSlotResponseSchema])
+    @router.get("/me", response_model=APIResponse[list[AvailableSlotResponseSchema]])
     def get_current_doctor_available_slots (
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
@@ -30,7 +30,10 @@ class DoctorSlots():
         obj = DoctorSlotServices(db, DoctorSlot)
         records = obj.get_doctor_available_slots(token)
 
-        return APIResponse[AvailableSlotResponseSchema](
+        logger.info(f"available slots fetched from database")
+        logger.debug(f"Slots: {records}")
+
+        return APIResponse[list[AvailableSlotResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message="Current doctor available slots fetched",

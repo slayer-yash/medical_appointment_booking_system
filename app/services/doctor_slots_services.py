@@ -2,6 +2,7 @@
 from fastapi import HTTPException
 from sqlalchemy import and_
 from app.models.doctor_slots import DoctorSlot
+from app.models.doctor import Doctor
 from app.services.basic_services import BasicServices
 from app.services.logging_services import LoggingService
 from app.utils.helper import get_payload
@@ -26,11 +27,11 @@ class DoctorSlotServices(BasicServices):
             logger.error(f"role does not match with 'doctor', role: {role}")
             raise HTTPException(401, "Only 'doctors' can access this method")
 
-        slots = self.db.query(DoctorSlot).filter(
+        slots = self.db.query(DoctorSlot).join(Doctor).filter(
             and_(
-                DoctorSlot.doctor_id==user_id,
+                Doctor.user_id==user_id,
                 DoctorSlot.is_booked==False
-            )       
+            )
         ).all()
 
         return slots

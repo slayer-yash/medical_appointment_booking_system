@@ -13,7 +13,7 @@ class AvailableSlotResponseSchema(BaseModel):
     start_time: datetime
     end_time: datetime
     is_booked: bool
-    notes: str
+    notes: Optional[str] = None
         
     
     class Config:
