@@ -75,8 +75,44 @@ class UserCreateDBSchema(UserCreateSchema):
 class UserDoctorCreateSchema(UserCreateSchema):
     speciality: str = Field(min_length=2, max_length=50, examples=["Cardiology"])
 
-    
+class UserUpdateSchema(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True
+
+    @field_validator("first_name")
+    def validate_first_name(name):
+        if name:
+            if len(name) < 2 or len(name) > 50:
+                raise HTTPException(422)
+            if not name.isalpha():
+                raise HTTPException(422)
+            return name
+
+    @field_validator("last_name")
+    def validate_last_name(name):
+        if name:
+            if len(name) < 2 or len(name) > 50:
+                raise HTTPException(422)
+            if not name.isalpha():
+                raise HTTPException(422)
+        return name
+
+    @field_validator("phone")
+    def validate_phone(phone):
+        if phone:
+            if not phone.isdigit():
+                raise HTTPException(422)
+            if len(phone) != 10:
+                raise HTTPException(422)
+            return phone
+
+    
 class UserResponseSchema(BaseModel):
     id: UUID
     username: str

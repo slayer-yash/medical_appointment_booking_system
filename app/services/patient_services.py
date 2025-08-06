@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
+from app.models.users import User
 from app.services.logging_services import LoggingService
 from app.utils.helper import get_payload
 
@@ -36,10 +37,32 @@ class PatientServices(BasicServices):
 
         if role != 'patient':
             logger.error(f"role does not match with 'patient', role: {role}")
-            raise HTTPException(401, "Only 'patients' can call this api")
+            raise HTTPException(401, "Only 'patients' can access this method")
 
         record = super().get_record_by_id(user_id)
         logger.info(f"patient object received from database")
         return record
-        
+
+
+    def update_current_patient(self, token, user_update:BaseModel):
+        logger.info(f"update_current_patient method called")
+        user = self.get_current_patient(token)
+
+        try:
+            logger.debug(f"Attempting to update patient profile, parameter: token:{token}, user_update: {user_update}")
+            for field, value in user_update.model_dump(exclude_unset=True).items():
+                if value:
+                    setattr(user, field, value)
+
+            self.db.commit()
+            self.db.refresh(user)
+            logger.info(f"Patient profile updated in database.")
+            logger.debug(f" User: {user}")
+            return user
+
+        except Exception as e:
+            logger.exception(f"error during update_current_patient method: {e}")
+            raise HTTPException(status_code=500, detail="error during updating current patient profile")
+
+
         

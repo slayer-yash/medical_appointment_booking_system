@@ -6,12 +6,11 @@ from app.services.logging_services import LoggingService
 from app.services.auth_service import AuthServices
 from app.services.patient_services import PatientServices
 from app.schemas.api_response import APIResponse
-from app.schemas.user import UserResponseSchema
+from app.schemas.user import UserResponseSchema, UserUpdateSchema
 from app.models.users import User
 from app.db.session import get_db
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
-
 
 
 
@@ -27,7 +26,7 @@ class Patient():
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
-        logger.info(f"get_current_patient_profile method started")
+        logger.info(f"GET/patients/me API accessed")
         obj = PatientServices(db, User)
         record = obj.get_current_patient(token)
 
@@ -35,6 +34,23 @@ class Patient():
             success=True,
             status_code=status.HTTP_200_OK,
             message=f"Current Logged in Patient fetched",
+            data=record
+        )
+
+    @router.patch("/me", response_model=APIResponse[UserResponseSchema])
+    def update_current_patient_profile(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        user:UserUpdateSchema,
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"PATCH/patients/me API accessed")
+        obj = PatientServices(db, User)
+        record = obj.update_current_patient(token, user)
+
+        return APIResponse[UserResponseSchema](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"Current Logged in Patient profile updated",
             data=record
         )
 

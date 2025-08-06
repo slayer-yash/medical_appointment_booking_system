@@ -8,7 +8,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-get_patient_profile = Endpoint(endpoint="/patients/me", methods=["GET"], roles=["patient"])
+get_update_patient_profile = Endpoint(endpoint="/patients/me", methods=["GET", "PATCH"], roles=["patient"])
 
 # session.add()
 # session.commit()
