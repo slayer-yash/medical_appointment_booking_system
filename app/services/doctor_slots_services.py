@@ -4,12 +4,12 @@ from sqlalchemy import and_
 from app.models.doctor_slots import DoctorSlot
 from app.models.doctor import Doctor
 from app.services.basic_services import BasicServices
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.utils.helper import get_payload
 import uuid
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class DoctorSlotServices(BasicServices):
     def __init__(self, db, model):

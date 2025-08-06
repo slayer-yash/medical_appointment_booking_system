@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.models.base_model import BaseModel as Base_Model
 from uuid import UUID
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class BasicServices:
     def __init__(self, db, model):

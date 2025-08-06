@@ -3,10 +3,10 @@ from datetime import datetime, timezone, timedelta
 import jwt
 from app.config.config import SECRET_KEY, TOKEN_ALGORITHM
 from app.models.users import User
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_password_hash(pwd) -> str:

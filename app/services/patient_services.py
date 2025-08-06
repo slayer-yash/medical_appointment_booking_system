@@ -4,11 +4,11 @@ from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
 from app.models.users import User
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.utils.helper import get_payload
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class PatientServices(BasicServices):
     def __init__(self, db, model):

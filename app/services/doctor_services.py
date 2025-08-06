@@ -3,12 +3,12 @@ from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
 from app.models.doctor_slots import DoctorSlot
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from datetime import timedelta, datetime
 
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class DoctorServices(BasicServices):
     def __init__(self, db, model):

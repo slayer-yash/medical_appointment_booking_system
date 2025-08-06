@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-class LoggingService():
+class Logging():
     def __init__(self, name:str = "appointment_app"):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)

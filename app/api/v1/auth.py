@@ -4,14 +4,14 @@ from app.schemas.token import Token
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.models.users import User
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.services.auth_service import AuthServices
 from app.schemas.api_response import APIResponse
 from app.db.session import get_db
 from typing import Annotated
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class Authorization():
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

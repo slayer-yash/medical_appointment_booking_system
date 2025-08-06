@@ -1,7 +1,7 @@
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, status
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.services.doctor_slots_services import DoctorSlotServices
 from app.schemas.api_response import APIResponse
 from app.schemas.slots import AvailableSlotResponseSchema, SlotUpdateSchema
@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class DoctorSlots():
 

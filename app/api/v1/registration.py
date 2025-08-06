@@ -7,12 +7,12 @@ from app.services.basic_services import BasicServices
 from app.services.doctor_services import DoctorServices
 from app.services.patient_services import PatientServices
 from app.services.nurse_services import NurseServices
-from app.services.logging_services import LoggingService
+from app.utils.Logging import Logging
 from app.models.users import User as UserModel
 from app.schemas.api_response import APIResponse
 
 
-logger = LoggingService(__name__).get_logger()
+logger = Logging(__name__).get_logger()
 
 class Registration:
     router = APIRouter(tags=["Registration"])
