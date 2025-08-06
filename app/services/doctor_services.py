@@ -1,13 +1,16 @@
 
 from fastapi import HTTPException
 from app.services.basic_services import BasicServices
+from sqlalchemy import and_
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
+from app.schemas.filters import DateFilterSchema
 from app.models.doctor import Doctor
 from app.models.doctor_slots import DoctorSlot
 from app.utils.logging import Logging
 from datetime import timedelta, datetime
 from app.utils.helper import get_payload
+from datetime import date
 
 
 logger = Logging(__name__).get_logger()

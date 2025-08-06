@@ -4,9 +4,11 @@ from sqlalchemy import and_
 from app.models.doctor_slots import DoctorSlot
 from app.models.doctor import Doctor
 from app.services.basic_services import BasicServices
+from app.schemas.filters import DateFilterSchema
 from app.utils.logging import Logging
 from app.utils.helper import get_payload
 import uuid
+from datetime import datetime
 
 
 logger = Logging(__name__).get_logger()
@@ -66,3 +68,27 @@ class DoctorSlotServices(BasicServices):
         logger.info(f"Doctor slot updated in database.")
         logger.debug(f" Slot: {slot}")
         return slot
+
+    def fetch_doctor_available_slots(self, token, doctor_id, date_filter:DateFilterSchema):
+
+        logger.info(f"fetch_doctor_available_slots method called")
+
+        records = self.db.query(self.model)
+        filters = []
+        filter_field = getattr(self.model, 'doctor_id')
+        filters.append(filter_field == doctor_id)
+
+        if date_filter.start_date:
+            start_time:datetime = date_filter.start_date
+            start_filter_field = getattr(self.model, 'start_time')
+            filters.append(start_filter_field >= start_time)
+
+        if date_filter.end_date:
+            end_time:datetime = date_filter.end_date
+            end_filter_field = getattr(self.model, 'end_time')
+            filters.append(end_filter_field <= end_time)
+
+
+        records = records.filter(and_(*filters)).all()
+        logger.debug(f"records: {records}")
+        return records
