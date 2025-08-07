@@ -6,8 +6,8 @@ from sqlalchemy.dialects.postgresql import UUID
 class DoctorSlot(BaseModel):
     __tablename__ = "doctor_slots"
     doctor_id = Column(UUID, ForeignKey("doctors.id"))
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+    start_time = Column(DateTime(timezone=True), nullable=False)
+    end_time = Column(DateTime(timezone=True), nullable=False)
     is_booked = Column(Boolean, default= False)
     notes = Column(String, nullable=True)
     

@@ -186,14 +186,7 @@ class AppointmentServices(BasicServices):
         raise HTTPException(
             500, f"Unable to fetch appointment history, role did not match with 'pateint' or 'doctor'. Role: {role}"
         )
-        # appointments = self.db.query(self.model).join(DoctorSlot).filter(
-        #     and_(
-        #         self.model.created_by == uuid_user_id,
-        #         DoctorSlot.start_time <= current_time
-        #     )
-        # )
-
-        return appointments
+        
             
 
         
