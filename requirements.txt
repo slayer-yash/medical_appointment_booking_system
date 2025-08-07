@@ -9,3 +9,4 @@ alembic
 passlib
 bcrypt
 pytz
+boto3
