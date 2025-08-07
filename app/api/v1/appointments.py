@@ -56,3 +56,22 @@ class Appointment():
             message=f"Appointment with id: {appointment_id} cancelled for logged in patient",
             data=record
         )
+
+    @router.get("/me/history", response_model=APIResponse[list[AppointmentResponseSchema]])
+    def get_user_appointments_history(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Get /appointments/me/history API accessed")
+
+        obj = AppointmentServices(db, AppointmentModel)
+        records = obj.fetch_user_appointments_history(token)
+
+        return APIResponse[list[AppointmentResponseSchema]](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"Appointment history of current logged in user fetched",
+            data=records
+        )
+
+        

@@ -81,4 +81,13 @@ class BasicServices:
             raise HTTPException()
         logger.debug(f"{sql_model} with ID {request_id} fetched successfully")
         return record
-            
+
+    def get_records_by_field(self, field, value):
+        logger.info(f"get_record_by_field method called")
+
+        records = self.db.query(self.model).filter(self.model.field == value).all()
+        if not records:
+            logger.error(f"{self.model} field : {field} having value: {value} not found")
+            raise HTTPException()
+        logger.debug(f"{self.model} field : {field} having value: {value} not found")
+        return records

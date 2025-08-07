@@ -15,6 +15,7 @@ get_doctors = Endpoint(endpoint="/doctors/", methods=["GET"], roles=["patient", 
 get_doctor_available_slot_by_id = Endpoint(endpoint="/doctors/*/available_slots", methods=["GET"], roles=["patient"])
 book_patient_appointment = Endpoint(endpoint="/appointments/book", methods=["POST"], roles=["patient"])
 cancel_patient_appointment = Endpoint(endpoint="/appointments/{appointment_id}/cancel", methods=["POST"], roles=["patient"])
+get_appointments_history = Endpoint(endpoint="/appointments/me/history", methods=["GET"], roles=["patient", "doctor"])
 
 
 # session.add()
