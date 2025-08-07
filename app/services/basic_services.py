@@ -46,7 +46,7 @@ class BasicServices:
         record = self.db.query(self.model).filter(self.model.id == request_id).first()
         if not record:
             logger.error(f"{self.model.__name__} ID {request_id} not found")
-            raise HTTPException()
+            raise HTTPException(404, f"{self.model.__name__} ID {request_id} not found")
         logger.debug(f"{self.model.__name__} with ID {request_id} fetched successfully")
         return record
 

@@ -88,7 +88,10 @@ class AppointmentServices(BasicServices):
         logger.info(f"validate_slot_for_appointment_booking method called")
 
         self.check_available_slot(slot)
-        self.check_slot_time_not_in_past(slot)
+        if self.check_slot_time_not_in_past(slot):
+            raise HTTPException(
+                400, "Slot Start time is in the past"
+            )
     
     def check_available_slot(self, slot):
         logger.info(f"check_available_slot method called")
@@ -107,9 +110,7 @@ class AppointmentServices(BasicServices):
         else:
             slot_start_time = slot.start_time
         if slot_start_time < current_time:
-            raise HTTPException(
-                400, "Slot Start time is in the past"
-            )
+            return True
         
     def cancel_patient_appointment(self, token, appointment_id):
         logger.info(f"cancel_patient_appointment method called")
@@ -134,7 +135,10 @@ class AppointmentServices(BasicServices):
 
             appointment.status = "cancelled"
 
-            self.check_slot_time_not_in_past(appointment.slot)
+            if self.check_slot_time_not_in_past(appointment.slot):
+                raise HTTPException(
+                400, "Slot Start time is in the past"
+            )
 
             appointment.slot.is_booked = False
             appointment.slot.notes = "appointment cancelled"
@@ -215,6 +219,33 @@ class AppointmentServices(BasicServices):
             500, f"Unable to fetch appointment history, role did not match with 'doctor'. Role: {role}"
         )
         
-            
+    def update_user_appointment_status(self, appointment_id, status):
+        logger.info(f"update_user_appointment_status method started")
 
+        appointment = super().get_record_by_id(appointment_id)
+        logger.debug(f"appointment: {appointment}")
+
+        if appointment.status == "cancelled":
+            logger.warning(f"Unable to update, the Appoinment status is already set to 'cancelled' ")
+            raise HTTPException(400, "Once cancelled, the appointment status can not be updated")
+
+        if status == "completed" and not self.check_slot_time_not_in_past(appointment.slot):
+            logger.warning(f"Attempting to set future appointment status as 'completed'")
+            raise HTTPException(400, "Unable to set the future appointment status to 'completed'")
+
+
+        if status == "cancelled":
+            if not self.check_slot_time_not_in_past(appointment.slot):
+                logger.info(f"Future appointment cancelled, so updating this slot to available slot")
+                appointment.slot.is_booked = False
+                appointment.slot.notes = "appointment cancelled"
+
+        appointment.status = status
+
+        logger.info(f"Attempting to update changes in the database")
+        self.db.commit()
+        self.db.refresh(appointment)
+        logger.info(f"Changes updated in the database")
+
+        return appointment
         

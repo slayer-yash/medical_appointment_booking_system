@@ -90,3 +90,23 @@ class Appointment():
             message=f"Upcoming appointments of current logged in user fetched",
             data=records
         )
+
+    @router.patch("/{id}", response_model=APIResponse[AppointmentResponseSchema])
+    def update_appointment_status(
+        appointment_id: UUID,
+        updated_status: str,
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Patch/appointments/id API accessed")
+
+        obj = AppointmentServices(db, AppointmentModel)
+        record = obj.update_user_appointment_status(appointment_id, updated_status)
+
+        return APIResponse[AppointmentResponseSchema](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"Appointment with appointment id: {appointment_id} updated",
+            data=record
+        )
+        
