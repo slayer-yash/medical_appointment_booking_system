@@ -38,3 +38,21 @@ class Appointment():
             message=f"Appointment booked for logged in patient",
             data=record
         )
+
+    @router.post("/{appointment_id}/cancel", response_model=APIResponse[AppointmentResponseSchema])
+    def cancel_appointment(
+        appointment_id: UUID,
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Post /appointments/{appointment_id}/cancel API accessed")
+
+        obj = AppointmentServices(db, AppointmentModel)
+        record = obj.cancel_patient_appointment(token, appointment_id)
+
+        return APIResponse[AppointmentResponseSchema](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"Appointment with id: {appointment_id} cancelled for logged in patient",
+            data=record
+        )

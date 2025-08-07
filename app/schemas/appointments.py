@@ -6,6 +6,7 @@ from app.schemas.slots import AvailableSlotResponseSchema
 from app.schemas.patient import PatientResponseSchema
 
 class AppointmentResponseSchema(BaseModel):
+    id: UUID
     doctor_id: UUID
     patient_id: UUID
     slot_id: UUID
