@@ -19,6 +19,9 @@ get_appointments_history = Endpoint(endpoint="/appointments/me/history", methods
 get_appointments_upcoming = Endpoint(endpoint="/appointments/me/upcoming", methods=["GET"], roles=[ "doctor"])
 update_appointments = Endpoint(endpoint="/appointments/*", methods=["PATCH"], roles=[ "nurse"])
 get_all_appointments =  Endpoint(endpoint="/appointments/", methods=["GET"], roles=[ "nurse"])
+add_patient_prescription =  Endpoint(endpoint="/prescriptions/*", methods=["POST"], roles=[ "doctor"])
+get_patient_prescription =  Endpoint(endpoint="/prescriptions/patient/*", methods=["GET"], roles=[ "doctor", "nurse"])
+
 
 # session.add()
 # session.commit()
