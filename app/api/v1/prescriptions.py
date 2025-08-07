@@ -72,3 +72,19 @@ class Prescription():
             message=f"prescription fetched for priscription id: {prescription_id}",
             data=record
         )
+
+    @router.get("/", response_model=APIResponse[list[PrescriptionURLResponseSchema]])
+    def get_all_prescription(
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Get/prescriptions/prescription_id API accessed")
+
+        obj = PrescriptionServices(db, PrescriptionModel)
+        records = obj.fetch_all_prescriptions()
+
+        return APIResponse[list[PrescriptionURLResponseSchema]](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"All prescriptions fetched",
+            data=records
+        )

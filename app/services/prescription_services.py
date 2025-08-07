@@ -117,5 +117,17 @@ class PrescriptionServices(BasicServices):
         prescription = pyschema(**prescription_data)
 
         return prescription
-    
+
+    def fetch_all_prescriptions(self):
+        logger.info(f"fetch_all_prescriptions method called")
+
+        prescriptions = super().get_all_records()
+        modified_prescriptions = []
+
+        for prescription in prescriptions:
+            new_prescription = self.get_presighned_url(prescription, PrescriptionURLResponseSchema)
+            modified_prescriptions.append(new_prescription)
+
+        return modified_prescriptions
+        
         
