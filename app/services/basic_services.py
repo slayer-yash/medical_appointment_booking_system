@@ -57,3 +57,28 @@ class BasicServices:
 
         logger.debug(f"Records fetched: {records}")
         return records
+
+    def add_record_object_to_db(self, record):
+        logger.info(f"add_record_object_to_db method called")
+
+        try:
+            logger.info(f"Attempting to add record")
+            self.db.add(record)
+            self.db.commit()
+            self.db.refresh(record)
+            logger.info(f"Record added to database")
+            return record
+
+        except Exception as e:
+            raise HTTPException(500, "Error during adding record object to database")
+
+    def get_record_by_model_id(self, sql_model, request_id):
+        logger.info(f"get_record_by_model_id method called")
+
+        record = self.db.query(sql_model).filter(sql_model.id == request_id).first()
+        if not record:
+            logger.error(f"{sql_model} ID {request_id} not found")
+            raise HTTPException()
+        logger.debug(f"{sql_model} with ID {request_id} fetched successfully")
+        return record
+            

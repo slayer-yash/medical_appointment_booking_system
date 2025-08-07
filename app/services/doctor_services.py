@@ -11,7 +11,10 @@ from app.utils.logging import Logging
 from datetime import timedelta, datetime
 from app.utils.helper import get_payload
 from datetime import date
+import pytz
 
+# Define the IST timezone
+ist_timezone = pytz.timezone('Asia/Kolkata')
 
 logger = Logging(__name__).get_logger()
 
@@ -47,7 +50,7 @@ class DoctorServices(BasicServices):
         return new_user
 
     def create_doctor_available_slots(self, doctor, slot_start_time=10, slot_end_time=18):
-        current_day = datetime.today().replace(minute=0, second=0)
+        current_day = datetime.now(ist_timezone).replace(minute=0, second=0)
         end_day = current_day+timedelta(days=5)
         start_day = current_day
         slots = []
@@ -56,7 +59,7 @@ class DoctorServices(BasicServices):
         while start_day<=end_day:
             slot_start = start_day.replace(hour=slot_start_time)
             last_slot = start_day.replace(hour=slot_end_time-1)
-            current_time = datetime.now()
+            current_time = datetime.now(ist_timezone)
             while slot_start <= last_slot:
                 if slot_start < current_time:
                     slot_start+=timedelta(hours=1)

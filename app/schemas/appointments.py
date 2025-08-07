@@ -2,8 +2,8 @@
 from pydantic import BaseModel
 from uuid import UUID
 from app.schemas.doctor import DoctorResponseSchema
-from app.schemas.user import UserResponseSchema
 from app.schemas.slots import AvailableSlotResponseSchema
+from app.schemas.patient import PatientResponseSchema
 
 class AppointmentResponseSchema(BaseModel):
     doctor_id: UUID
@@ -12,7 +12,7 @@ class AppointmentResponseSchema(BaseModel):
     status: str
     created_by: UUID
     doctor: DoctorResponseSchema
-    patient: UserResponseSchema
+    patient: PatientResponseSchema
     slot: AvailableSlotResponseSchema
 
     class Config:

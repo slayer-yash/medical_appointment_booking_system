@@ -2,12 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.token import Token
 from app.models.doctor_slots import DoctorSlot
 from app.models.appointments import Appointment
+from app.models.users import User
 from app.utils.helper import get_payload
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from app.utils.logging import Logging
 from app.services.basic_services import BasicServices
-
 import uuid
+import pytz
+
+# Define the IST timezone
+ist_timezone = pytz.timezone('Asia/Kolkata')
+
 
 logger = Logging(__name__).get_logger()
 
@@ -27,13 +32,17 @@ class AppointmentServices(BasicServices):
             if slot is None:
                 logger.error(f"Slot with ID {slot_id} does not exist")
                 raise HTTPException(404, f"Slot with ID {slot_id} does not exist")
+
+            self.validate_slot_for_appointment_booking(slot=slot)
             
             payload = get_payload(token)
             logger.debug(f"payload received: {payload}")
             
             user_id = payload.get('user_id')
             role = payload.get('role')
-            uuid_user_id = uuid.UUID(user_id)        
+            uuid_user_id = uuid.UUID(user_id)   
+
+            user = super().get_record_by_model_id(User, uuid_user_id)
 
             if role != 'patient':
                 logger.error(f"role does not match with 'patient', role: {role}")
@@ -42,7 +51,7 @@ class AppointmentServices(BasicServices):
             logger.info(f"Creating appointment sqlalchemy object")
             appointment = Appointment(
                 doctor_id = slot.doctor_id,
-                patient_id = uuid_user_id,
+                patient_id = user.patient.id,
                 slot_id = slot.id,
                 status = 'booked',
                 created_by = uuid_user_id
@@ -71,6 +80,29 @@ class AppointmentServices(BasicServices):
             self.db.rollback()
             logger.error(f"Error occured during adding appointment to database: {e}")
             raise HTTPException(500, f"Error occured during adding appointment to database")
-    
 
+    def validate_slot_for_appointment_booking(self, slot):
+        logger.info(f"validate_slot_for_appointment_booking method called")
+
+        self.check_available_slot(slot)
+
+        logger.info(f"Checking if slot start_time is not in the past")
+        current_time = datetime.now(ist_timezone)
+        if slot.start_time.tzinfo is None or slot.start_time.tzinfo.utcoffset(slot.start_time) is None:
+            logger.warning("slot.start_time is naive. Localizing it to IST.")
+            slot_start_time = ist_timezone.localize(slot.start_time)
+        else:
+            slot_start_time = slot.start_time
+        if slot_start_time < current_time:
+            raise HTTPException(
+                400, "Unable to book appointment, Slot Start time is in the past"
+            )
+    
+    def check_available_slot(self, slot):
+        logger.info(f"check_available_slot method called")
+        if slot.is_booked:
+            logger.error(f"Slot is already booked, slot: {slot}")
+            raise HTTPException(
+                400, f"Unable to book appointment between {slot.start_time} and {slot.end_time}, slot with id {slot.id} is already booked"
+            )
         

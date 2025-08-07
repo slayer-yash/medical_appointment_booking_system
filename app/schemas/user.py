@@ -126,6 +126,7 @@ class UserResponseSchema(BaseModel):
         arbitrary_types_allowed = True
 
 class DoctorResponseSchema(BaseModel):
+    id: UUID
     user_id: UUID
     speciality: str
 

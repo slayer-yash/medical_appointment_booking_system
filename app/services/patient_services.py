@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
 from app.models.doctor import Doctor
 from app.models.users import User
+from app.models.patients import Patient
 from app.utils.logging import Logging
 from app.utils.helper import get_payload
 
@@ -23,7 +24,15 @@ class PatientServices(BasicServices):
         logger.debug(F"user_create object initialized: {user_create}")
         new_user = super().add_record(user_create)
 
-        logger.info(f"patient profile added to database")
+        logger.info(f"user added to database")
+
+        patient = Patient(
+            user_id = new_user.id
+        )
+        logger.debug(f"Patient profile created: patient: {patient}")
+
+        record = super().add_record_object_to_db(patient)
+        
         return new_user
 
     def get_current_patient(self, token):
