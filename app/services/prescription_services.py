@@ -6,6 +6,7 @@ from app.models.patients import Patient
 from app.models.appointments import Appointment
 from app.models.prescriptions import Prescription
 from app.models.users import User
+from app.schemas.prescriptions import PrescriptionURLResponseSchema
 from app.utils.logging import Logging
 from app.utils.helper import get_payload
 from botocore.exceptions import NoCredentialsError
@@ -29,8 +30,8 @@ class PrescriptionServices(BasicServices):
         user = super().get_record_by_model_id(User, uuid_user_id)
         appointment = super().get_record_by_model_id(Appointment, appointment_id)
 
-        prescription = self.db.query(self.model).filter(self.model.appointment_id == appointment_id)
-        if prescription:
+        prescription_record = self.db.query(self.model).filter(self.model.appointment_id == appointment_id).first()
+        if prescription_record:
             raise HTTPException(
                400, f"Prescription already generated for appointment id: {appointment_id}, unable to generate another prescription" 
             )
@@ -83,4 +84,38 @@ class PrescriptionServices(BasicServices):
         prescriptions = self.db.query(self.model).filter(self.model.patient_id == patient_id).all()
         logger.debug(f"prescriptions fetched, prescriptions: {prescriptions}")
 
-        return prescriptions
+        modified_prescriptions = []
+
+        for prescription in prescriptions:
+            new_prescription = self.get_presighned_url(prescription, PrescriptionURLResponseSchema)
+            modified_prescriptions.append(new_prescription)
+
+        return modified_prescriptions
+
+    def fetch_patient_prescription(self, prescription_id):
+        logger.info(f"fetch_patient_prescription method called")
+
+        prescription = super().get_record_by_id(prescription_id)
+
+        logger.info(f"Attempting to generate url for prescription")
+        prescription = self.get_presighned_url(prescription, PrescriptionURLResponseSchema)
+
+        return prescription
+
+    def get_presighned_url(self, object, pyschema):
+        logger.info(f"get_presighned_url method called")
+        
+        prescription_out = pyschema.model_validate(object)
+        prescription_data = prescription_out.model_dump()
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': object.prescription_obj},
+            ExpiresIn = 600
+        )
+        logger.debug(f"Url generated : {url}")
+        prescription_data['prescription_url'] = url
+        prescription = pyschema(**prescription_data)
+
+        return prescription
+    
+        

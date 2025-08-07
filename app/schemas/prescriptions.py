@@ -1,5 +1,6 @@
 
 from pydantic import BaseModel
+from typing import Optional
 from uuid import UUID
 from app.schemas.doctor import DoctorResponseSchema
 from app.schemas.patient import PatientResponseSchema
@@ -16,3 +17,7 @@ class PrescriptionResponseSchema(BaseModel):
     class Config:
         from_attributes = True
         arbitrary_types_allowed = True
+
+
+class PrescriptionURLResponseSchema(PrescriptionResponseSchema):
+    prescription_url: Optional[str] = None

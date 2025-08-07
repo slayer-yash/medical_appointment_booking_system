@@ -21,6 +21,8 @@ update_appointments = Endpoint(endpoint="/appointments/*", methods=["PATCH"], ro
 get_all_appointments =  Endpoint(endpoint="/appointments/", methods=["GET"], roles=[ "nurse"])
 add_patient_prescription =  Endpoint(endpoint="/prescriptions/*", methods=["POST"], roles=[ "doctor"])
 get_patient_prescription =  Endpoint(endpoint="/prescriptions/patient/*", methods=["GET"], roles=[ "doctor", "nurse"])
+get_prescription =  Endpoint(endpoint="/prescriptions/*", methods=["GET"], roles=["doctor", "nurse"])
+
 
 
 # session.add()
