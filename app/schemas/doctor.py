@@ -16,6 +16,7 @@ class AvailableDoctorResponseSchema(BaseModel):
 
 
 class DoctorResponseSchema(BaseModel):
+    id: UUID
     user_id: UUID
     speciality: str
     user: UserResponseSchema

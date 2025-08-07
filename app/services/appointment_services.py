@@ -152,6 +152,7 @@ class AppointmentServices(BasicServices):
             raise HTTPException(f"Error during canceling patient appointment")
 
     def fetch_user_appointments_history(self, token):
+        logger.info(f"fetch_user_appointments_history method started")
         
         payload = get_payload(token)
         logger.debug(f"payload received: {payload}")
@@ -167,7 +168,7 @@ class AppointmentServices(BasicServices):
             appointments = self.db.query(self.model).join(Doctor).join(DoctorSlot).filter(
                 and_(
                     Doctor.user_id == uuid_user_id,
-                    DoctorSlot.start_time <= current_time
+                    DoctorSlot.start_time < current_time
                 )
             )
             logger.info(f"appointments fetched from the database for role: {role}")
@@ -185,6 +186,33 @@ class AppointmentServices(BasicServices):
 
         raise HTTPException(
             500, f"Unable to fetch appointment history, role did not match with 'pateint' or 'doctor'. Role: {role}"
+        )
+
+    def fetch_user_appointments_upcoming(self, token):
+        logger.info(F"fetch_user_appointments_upcoming method started")
+        
+        payload = get_payload(token)
+        logger.debug(f"payload received: {payload}")
+        
+        user_id = payload.get('user_id')
+        role = payload.get('role')
+        uuid_user_id = uuid.UUID(user_id) 
+
+        current_time = datetime.now(ist_timezone)
+        logger.debug(f"current_time: {current_time}")
+
+        if role == "doctor":
+            appointments = self.db.query(self.model).join(Doctor).join(DoctorSlot).filter(
+                and_(
+                    Doctor.user_id == uuid_user_id,
+                    DoctorSlot.start_time > current_time
+                )
+            )
+            logger.info(f"appointments fetched from the database for role: {role}")
+            return appointments
+
+        raise HTTPException(
+            500, f"Unable to fetch appointment history, role did not match with 'doctor'. Role: {role}"
         )
         
             

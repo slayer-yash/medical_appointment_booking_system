@@ -74,4 +74,19 @@ class Appointment():
             data=records
         )
 
-        
+    @router.get("/me/upcoming", response_model=APIResponse[list[AppointmentResponseSchema]])
+    def get_user_appointments_upcoming(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Get /appointments/me/upcoming API accessed")
+
+        obj = AppointmentServices(db, AppointmentModel)
+        records = obj.fetch_user_appointments_upcoming(token)
+
+        return APIResponse[list[AppointmentResponseSchema]](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"Upcoming appointments of current logged in user fetched",
+            data=records
+        )
