@@ -14,5 +14,5 @@ class Attendance(BaseModel):
     time_in = Column(DateTime(timezone=True), default=datetime.now(ist))
     time_out = Column(DateTime(timezone=True), nullable=True)
     created_by = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"))
-    user = relationship("User", foreign_keys="attendances.user_id", back_populates="attendances", uselist=False)
+    user = relationship("User", foreign_keys="Attendance.user_id", back_populates="attendances", uselist=False)
     

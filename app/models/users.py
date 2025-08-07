@@ -16,7 +16,7 @@ class User(BaseModel):
 
     doctor = relationship("Doctor", back_populates="user", uselist=False, foreign_keys="Doctor.user_id")
     patient = relationship("Patient", back_populates="user", uselist=False, foreign_keys="Patient.user_id")
-    attendances = relationship("Attendance", back_populates="user", foreign_keys="attendances.user_id")
+    attendances = relationship("Attendance", back_populates="user", foreign_keys="Attendance.user_id")
     
 
     @validates('first_name')
