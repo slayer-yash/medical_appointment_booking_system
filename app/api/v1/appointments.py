@@ -109,4 +109,21 @@ class Appointment():
             message=f"Appointment with appointment id: {appointment_id} updated",
             data=record
         )
+
+    @router.get("/", response_model=APIResponse[list[AppointmentResponseSchema]])
+    def get_all_appointments(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+    ):
+        logger.info(f"Get /appointments/ API accessed")
+
+        obj = AppointmentServices(db, AppointmentModel)
+        records = obj.fetch_all_appointments()
+
+        return APIResponse[list[AppointmentResponseSchema]](
+            success=True,
+            status_code=status.HTTP_200_OK,
+            message=f"All appointments fetched",
+            data=records
+        )
         

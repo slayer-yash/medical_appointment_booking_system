@@ -18,7 +18,7 @@ cancel_patient_appointment = Endpoint(endpoint="/appointments/{appointment_id}/c
 get_appointments_history = Endpoint(endpoint="/appointments/me/history", methods=["GET"], roles=["patient", "doctor"])
 get_appointments_upcoming = Endpoint(endpoint="/appointments/me/upcoming", methods=["GET"], roles=[ "doctor"])
 update_appointments = Endpoint(endpoint="/appointments/*", methods=["PATCH"], roles=[ "nurse"])
-
+get_all_appointments =  Endpoint(endpoint="/appointments/", methods=["GET"], roles=[ "nurse"])
 
 # session.add()
 # session.commit()

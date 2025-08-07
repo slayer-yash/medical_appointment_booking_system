@@ -248,4 +248,13 @@ class AppointmentServices(BasicServices):
         logger.info(f"Changes updated in the database")
 
         return appointment
+
+    def fetch_all_appointments(self):
+        logger.info(f"fetch_all_appointments method called")
+
+        records = super().get_all_records()
+        logger.debug(f"Records fetched, records: {records}")
+
+        return records
+    
         
