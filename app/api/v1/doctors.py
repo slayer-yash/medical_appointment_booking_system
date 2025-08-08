@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query, status
 from app.utils.logging import Logging
 from app.services.doctor_services import DoctorServices
 from app.services.doctor_slots_services import DoctorSlotServices
+from app.services.search_service import SearchService
 from app.schemas.doctor import AvailableDoctorResponseSchema, DoctorResponseSchema
 from app.schemas.doctor_slots import AvailableSlotResponseSchema
 from app.schemas.api_response import APIResponse
@@ -24,39 +25,55 @@ class Doctor():
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
     router = APIRouter(prefix="/doctors", tags=["Doctor"])
 
-    @router.get("/available", response_model=APIResponse[list[AvailableDoctorResponseSchema]])
-    def get_available_doctors(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
+    @router.get("/slots", response_model=APIResponse[list[AvailableDoctorResponseSchema]])
+    def get_doctors_slots(
+        db: Session = Depends(get_db),
+        search: str = None,
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
-        logger.info(f"Get/doctors/available api called")
+        logger.info(f"Get/doctors/slots api called")
 
+        allowed_fields = ['speciality', 'id']
         obj = DoctorServices(db, DoctorModel)
-        records = obj.fetch_doctors(token)
+        records, total_recores = obj.fetch_doctors(filters, sort_by, sort_order, page, limit, allowed_fields, search)
 
         return APIResponse[list[AvailableDoctorResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
-            message="Doctors with available slots fetched",
-            data=records
+            message="Doctors with slots fetched",
+            data=records,
+            total_records=total_recores,
+            current_page=page
         )
 
 
     @router.get("/", response_model=APIResponse[list[DoctorResponseSchema]])
     def get_all_doctors(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        search: str = None,
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
         logger.info(f"Get/doctors/ api called")
 
+        allowed_fields = ['speciality', 'id']
         obj = DoctorServices(db, DoctorModel)
-        records = obj.fetch_doctors(token)
+        records, total_recores = obj.fetch_doctors(filters, sort_by, sort_order, page, limit, allowed_fields, search)
 
         return APIResponse[list[DoctorResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message="All Doctors fetched",
-            data=records
+            data=records,
+            total_records=total_recores,
+            current_page=page
         )
 
     @router.get("/{doctor_id}/available_slots", response_model=APIResponse[list[AvailableSlotResponseSchema]])

@@ -1,6 +1,7 @@
 
 from fastapi import HTTPException
 from app.services.basic_services import BasicServices
+from app.services.filter_pagination_services import FilterPaginationService
 from sqlalchemy import and_
 from pydantic import BaseModel
 from app.schemas.user import UserCreateDBSchema
@@ -78,18 +79,24 @@ class DoctorServices(BasicServices):
         super().add_records(slots)
         return slots
     
-    def fetch_doctors(self, token):
+    def fetch_doctors(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
         logger.info(f"fetch_doctors method called")
-        payload = get_payload(token)
-
-        logger.debug(f"payload received: {payload}")
-        user_id = payload.get('user_id')
-        role = payload.get('role')
         
         # if role != 'patient':
         #     logger.error(f"role does not match with 'patient', role: {role}")
         #     raise HTTPException(401, "Only 'patients' can access this method")
 
-        doctors = super().get_all_records()
+        records = None
+        search_filters = None
+        if search:
+            logger.debug(f"Search term provided: '{search.strip()}'")
+            records, search_filters = super().search_record(search.strip())
+
+        obj = FilterPaginationService(self.model, allowed_fields, self.db)
+        records= obj.apply_filter_pagination(filters, sort_by, sort_order, page, limit, records, search_filters)
+        logger.info(f"Records fetched for {self.model.__name__}")
+        return records
+
+        # doctors = super().get_all_records()
         
-        return doctors
+        # return doctors

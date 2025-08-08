@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 from app.utils.logging import Logging
 from app.models.base_model import BaseModel as Base_Model
+from app.services.search_service import SearchService
 from uuid import UUID
 from datetime import datetime
 import pytz
@@ -10,7 +11,7 @@ ist_timezone = pytz.timezone('Asia/Kolkata')
 
 logger = Logging(__name__).get_logger()
 
-class BasicServices:
+class BasicServices(SearchService):
     def __init__(self, db, model):
         self.db = db
         self.model = model
