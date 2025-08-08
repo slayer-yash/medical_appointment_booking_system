@@ -60,42 +60,57 @@ class Appointment():
     @router.get("/me/history", response_model=APIResponse[list[AppointmentResponseSchema]])
     def get_user_appointments_history(
         token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
         logger.info(f"Get /appointments/me/history API accessed")
 
+        allowed_fields = ['doctor_id', 'patient_id', 'slot_id', 'status']
         obj = AppointmentServices(db, AppointmentModel)
-        records = obj.fetch_user_appointments_history(token)
+        records, total_records = obj.fetch_user_appointments_history(token, filters, sort_by, sort_order, page, limit, allowed_fields)
 
         return APIResponse[list[AppointmentResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message=f"Appointment history of current logged in user fetched",
-            data=records
+            data=records,
+            total_records=total_records,
+            current_page=page
         )
 
     @router.get("/me/upcoming", response_model=APIResponse[list[AppointmentResponseSchema]])
     def get_user_appointments_upcoming(
         token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
         logger.info(f"Get /appointments/me/upcoming API accessed")
 
+        allowed_fields = ['doctor_id', 'patient_id', 'slot_id', 'status']
         obj = AppointmentServices(db, AppointmentModel)
-        records = obj.fetch_user_appointments_upcoming(token)
+        records, total_records = obj.fetch_user_appointments_upcoming(token, filters, sort_by, sort_order, page, limit, allowed_fields)
 
         return APIResponse[list[AppointmentResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message=f"Upcoming appointments of current logged in user fetched",
-            data=records
+            data=records,
+            total_records=total_records,
+            current_page=page
         )
 
     @router.patch("/{id}", response_model=APIResponse[AppointmentResponseSchema])
     def update_appointment_status(
         appointment_id: UUID,
         updated_status: str,
-        token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
         logger.info(f"Patch/appointments/id API accessed")
@@ -112,18 +127,26 @@ class Appointment():
 
     @router.get("/", response_model=APIResponse[list[AppointmentResponseSchema]])
     def get_all_appointments(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        search: str = None,
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
         logger.info(f"Get /appointments/ API accessed")
 
+        allowed_fields = ['doctor_id', 'patient_id', 'slot_id', 'status']
         obj = AppointmentServices(db, AppointmentModel)
-        records = obj.fetch_all_appointments()
+        records, total_recores = obj.fetch_all_appointments(filters, sort_by, sort_order, page, limit, allowed_fields, search)
 
         return APIResponse[list[AppointmentResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message=f"All appointments fetched",
-            data=records
+            data=records,
+            total_records=total_recores,
+            current_page=page
         )
         

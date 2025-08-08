@@ -9,6 +9,7 @@ from app.utils.helper import get_payload
 from datetime import timedelta, datetime, timezone
 from app.utils.logging import Logging
 from app.services.basic_services import BasicServices
+from app.services.filter_pagination_services import FilterPaginationService
 from sqlalchemy import and_
 import uuid
 import pytz
@@ -155,7 +156,7 @@ class AppointmentServices(BasicServices):
             logger.error(f"Error during canceling patient appointment {e}")
             raise HTTPException(f"Error during canceling patient appointment")
 
-    def fetch_user_appointments_history(self, token):
+    def fetch_user_appointments_history(self, token, filters, sort_by, sort_order, page, limit, allowed_fields, search=None):
         logger.info(f"fetch_user_appointments_history method started")
         
         payload = get_payload(token)
@@ -168,31 +169,33 @@ class AppointmentServices(BasicServices):
         current_time = datetime.now(ist_timezone)
         logger.debug(f"current_time: {current_time}")
 
+        records = self.db.query(self.model)
+
         if role == "doctor":
-            appointments = self.db.query(self.model).join(Doctor).join(DoctorSlot).filter(
+            records = records.join(Doctor).join(DoctorSlot).filter(
                 and_(
                     Doctor.user_id == uuid_user_id,
                     DoctorSlot.start_time < current_time
                 )
             )
             logger.info(f"appointments fetched from the database for role: {role}")
-            return appointments
 
         if role == "patient":
-            appointments = self.db.query(self.model).join(Patient).join(DoctorSlot).filter(
+            records = records.join(Patient).join(DoctorSlot).filter(
                 and_(
                     Patient.user_id == uuid_user_id,
                     DoctorSlot.start_time <= current_time
                 )
             )
             logger.info(f"appointments fetched from the database for role: {role}")
-            return appointments
 
-        raise HTTPException(
-            500, f"Unable to fetch appointment history, role did not match with 'pateint' or 'doctor'. Role: {role}"
-        )
+        obj = FilterPaginationService(self.model, allowed_fields, self.db)
+        records, total_records= obj.apply_filter_pagination(filters, sort_by, sort_order, page, limit, records)
 
-    def fetch_user_appointments_upcoming(self, token):
+        return records, total_records
+
+
+    def fetch_user_appointments_upcoming(self, token, filters, sort_by, sort_order, page, limit, allowed_fields, search=None):
         logger.info(F"fetch_user_appointments_upcoming method started")
         
         payload = get_payload(token)
@@ -205,19 +208,21 @@ class AppointmentServices(BasicServices):
         current_time = datetime.now(ist_timezone)
         logger.debug(f"current_time: {current_time}")
 
+        records = self.db.query(self.model)
+
         if role == "doctor":
-            appointments = self.db.query(self.model).join(Doctor).join(DoctorSlot).filter(
+            records =records.join(Doctor).join(DoctorSlot).filter(
                 and_(
                     Doctor.user_id == uuid_user_id,
                     DoctorSlot.start_time > current_time
                 )
             )
             logger.info(f"appointments fetched from the database for role: {role}")
-            return appointments
 
-        raise HTTPException(
-            500, f"Unable to fetch appointment history, role did not match with 'doctor'. Role: {role}"
-        )
+        obj = FilterPaginationService(self.model, allowed_fields, self.db)
+        records, total_records= obj.apply_filter_pagination(filters, sort_by, sort_order, page, limit, records)
+
+        return records, total_records
         
     def update_user_appointment_status(self, appointment_id, status):
         logger.info(f"update_user_appointment_status method started")
@@ -249,12 +254,18 @@ class AppointmentServices(BasicServices):
 
         return appointment
 
-    def fetch_all_appointments(self):
+    def fetch_all_appointments(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
         logger.info(f"fetch_all_appointments method called")
 
-        records = super().get_all_records()
-        logger.debug(f"Records fetched, records: {records}")
+        records = None
+        search_filters = None
+        if search:
+            logger.debug(f"Search term provided: '{search.strip()}'")
+            records, search_filters = super().search_record(search.strip())
 
+        obj = FilterPaginationService(self.model, allowed_fields, self.db)
+        records= obj.apply_filter_pagination(filters, sort_by, sort_order, page, limit, records, search_filters)
+        logger.info(f"Records fetched for {self.model.__name__}")
         return records
     
         

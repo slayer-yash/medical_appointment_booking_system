@@ -57,7 +57,7 @@ class Prescription():
         )
 
     @router.get("/{prescription_id}", response_model=APIResponse[PrescriptionURLResponseSchema])
-    def get_patient_prescription(
+    def get_prescription(
         prescription_id: UUID,
         db: Session = Depends(get_db)
     ):

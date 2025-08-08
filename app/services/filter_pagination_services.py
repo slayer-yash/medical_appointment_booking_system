@@ -13,7 +13,7 @@ class FilterPaginationService:
         self.allowed_fields = allowed_fields
         self.db = db
 
-    def apply_filter_pagination(self, filters, sort_by, sort_order, page, limit, records, search_filters):
+    def apply_filter_pagination(self, filters, sort_by, sort_order, page, limit, records, search_filters=None):
         logger.info("Starting filter and pagination process")
         self.verify_filters(filters, sort_by, sort_order, page, limit)
 
