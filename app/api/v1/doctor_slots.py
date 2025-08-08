@@ -42,7 +42,7 @@ class DoctorSlots():
         )
 
     @router.patch("/me", response_model=APIResponse[AvailableSlotResponseSchema])
-    def get_current_doctor_available_slots (
+    def update_current_doctor_available_slots (
         token: Annotated[str, Depends(oauth2_scheme)],
         slot_id: UUID,
         slot_update: SlotUpdateSchema,
