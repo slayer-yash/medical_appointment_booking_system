@@ -11,7 +11,7 @@ class Attendance(BaseModel):
     __tablename__ = "attendances"
     user_id = Column(UUID, ForeignKey("users.id"))
     date = Column(Date, default=datetime.now(ist).date())
-    time_in = Column(DateTime(timezone=True), default=datetime.now(ist))
+    time_in = Column(DateTime(timezone=True), default=lambda: datetime.now(ist))
     time_out = Column(DateTime(timezone=True), nullable=True)
     created_by = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("User", foreign_keys="Attendance.user_id", back_populates="attendances", uselist=False)

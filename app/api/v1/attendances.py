@@ -34,3 +34,20 @@ class Attendance():
             message=f"User attendance time in saved",
             data=record
         )
+
+    @router.post("/time_out", response_model=APIResponse[AttendanceResponseSchema])
+    def user_attendance_time_out(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session =Depends(get_db)
+    ):
+        logger.info(f"Post/ attendances/time_out API accessed")
+
+        obj = AttendanceServices(db, AttendanceModel)
+        record = obj.update_user_timeout(token)
+
+        return APIResponse[AttendanceResponseSchema](
+            success=True,
+            status_code=status.HTTP_201_CREATED,
+            message=f"User attendance time out saved",
+            data=record
+        )

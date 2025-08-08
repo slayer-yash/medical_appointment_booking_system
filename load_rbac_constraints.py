@@ -24,6 +24,7 @@ get_patient_prescription =  Endpoint(endpoint="/prescriptions/patient/*", method
 get_prescription =  Endpoint(endpoint="/prescriptions/*", methods=["GET"], roles=["doctor", "nurse"])
 get_all_prescriptions =  Endpoint(endpoint="/prescriptions/", methods=["GET"], roles=["nurse"])
 mark_attendance_timein =  Endpoint(endpoint="/attendances/time_in", methods=["POST"], roles=["nurse", "doctor"])
+mark_attendance_timeout =  Endpoint(endpoint="/attendances/time_out", methods=["POST"], roles=["nurse", "doctor"])
 
 
 

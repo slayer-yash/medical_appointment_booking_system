@@ -3,6 +3,10 @@ from fastapi import HTTPException
 from app.utils.logging import Logging
 from app.models.base_model import BaseModel as Base_Model
 from uuid import UUID
+from datetime import datetime
+import pytz
+
+ist_timezone = pytz.timezone('Asia/Kolkata')
 
 logger = Logging(__name__).get_logger()
 
@@ -91,3 +95,21 @@ class BasicServices:
             raise HTTPException()
         logger.debug(f"{self.model} field : {field} having value: {value} not found")
         return records
+
+    def records_modified(self, record, user_id):
+        '''
+        updates the modified_at and modified_by field of object, anytime it is modified.
+        requires: the object that is modified as record and user_id of the user updating the record
+        returns: the updated record after updating modified_at, modifie_by field
+        '''
+        try:
+            logger.debug(f"Modifying record of {self.model.__name__} by user {user_id}")
+            record.modified_at = datetime.now(ist_timezone)
+            record.modified_by = user_id
+            self.db.commit()
+            logger.info(f"Record in {self.model.__name__} modified by user {user_id}")
+            return record
+        except Exception as e:
+            self.db.rollback()
+            logger.exception(f"Error modifying {self.model.__name__} record: {e}")
+            raise HTTPException(500, f"Database Error during modifying {self.model.__name__} record: {e}")
