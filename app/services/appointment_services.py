@@ -6,6 +6,7 @@ from app.models.patients import Patient
 from app.models.appointments import Appointment
 from app.models.users import User
 from app.utils.helper import get_payload
+from celery_app.task import send_mail
 from datetime import timedelta, datetime, timezone
 from app.utils.logging import Logging
 from app.services.basic_services import BasicServices
@@ -75,6 +76,13 @@ class AppointmentServices(BasicServices):
             self.db.commit()
             self.db.refresh(appointment)
             logger.info(f"Refreshing the appointment object")
+
+            send_mail.apply_async((
+                user.email,
+                "Appointment booked ",
+                f"Dear {user.first_name}, \nYour appointment is booked with doctor {appointment.doctor.user.first_name} {appointment.doctor.user.last_name}\nAppointment id: {appointment.id} \nTime: {appointment.slot.start_time}   \n\n\nThank you,\nOnline Appointment Booking System",
+                appointment.id
+            ))
             
             return appointment
         except HTTPException:

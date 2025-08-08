@@ -10,3 +10,5 @@ passlib
 bcrypt
 pytz
 boto3
+celery[redis]
+reportlab
