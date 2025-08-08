@@ -21,7 +21,7 @@ class DoctorSlots():
     router = APIRouter(prefix="/doctor_slots", tags=["Doctor Slots"])
 
     @router.get("/me", response_model=APIResponse[list[AvailableSlotResponseSchema]])
-    def get_current_doctor_available_slots (
+    async def get_current_doctor_available_slots (
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
@@ -42,7 +42,7 @@ class DoctorSlots():
         )
 
     @router.patch("/me", response_model=APIResponse[AvailableSlotResponseSchema])
-    def update_current_doctor_available_slots (
+    async def update_current_doctor_available_slots (
         token: Annotated[str, Depends(oauth2_scheme)],
         slot_id: UUID,
         slot_update: SlotUpdateSchema,

@@ -20,7 +20,7 @@ class Appointment():
     router = APIRouter(prefix="/appointments", tags=["Appointment"])
 
     @router.post("/book", response_model=APIResponse[AppointmentResponseSchema])
-    def book_appointment(
+    async def book_appointment(
         slot_id: UUID,
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
@@ -40,7 +40,7 @@ class Appointment():
         )
 
     @router.post("/{appointment_id}/cancel", response_model=APIResponse[AppointmentResponseSchema])
-    def cancel_appointment(
+    async def cancel_appointment(
         appointment_id: UUID,
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
@@ -58,7 +58,7 @@ class Appointment():
         )
 
     @router.get("/me/history", response_model=APIResponse[list[AppointmentResponseSchema]])
-    def get_user_appointments_history(
+    async def get_user_appointments_history(
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db),
         filters: str = None,
@@ -83,7 +83,7 @@ class Appointment():
         )
 
     @router.get("/me/upcoming", response_model=APIResponse[list[AppointmentResponseSchema]])
-    def get_user_appointments_upcoming(
+    async def get_user_appointments_upcoming(
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db),
         filters: str = None,
@@ -108,7 +108,7 @@ class Appointment():
         )
 
     @router.patch("/{id}", response_model=APIResponse[AppointmentResponseSchema])
-    def update_appointment_status(
+    async def update_appointment_status(
         appointment_id: UUID,
         updated_status: str,
         db: Session = Depends(get_db)
@@ -126,7 +126,7 @@ class Appointment():
         )
 
     @router.get("/", response_model=APIResponse[list[AppointmentResponseSchema]])
-    def get_all_appointments(
+    async def get_all_appointments(
         db: Session = Depends(get_db),
         search: str = None,
         filters: str = None,

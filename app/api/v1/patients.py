@@ -22,7 +22,7 @@ class Patient():
     router = APIRouter(prefix="/patients", tags=["Patient"])
 
     @router.get("/me", response_model=APIResponse[UserResponseSchema])
-    def get_current_patient_profile(
+    async def get_current_patient_profile(
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
@@ -38,7 +38,7 @@ class Patient():
         )
 
     @router.patch("/me", response_model=APIResponse[UserResponseSchema])
-    def update_current_patient_profile(
+    async def update_current_patient_profile(
         token: Annotated[str, Depends(oauth2_scheme)],
         user:UserUpdateSchema,
         db: Session = Depends(get_db)

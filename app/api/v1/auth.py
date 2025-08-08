@@ -18,7 +18,7 @@ class Authorization():
     router = APIRouter(prefix="/auth", tags=["Authorization"])
 
     @router.post("/login", response_model=APIResponse[Token])
-    def login(form_data: OAuth2PasswordRequestForm = Depends(), db:Session = Depends(get_db)):
+    async def login(form_data: OAuth2PasswordRequestForm = Depends(), db:Session = Depends(get_db)):
         '''
         Authenticates user and returns access and refresh token and saves refresh token in db.
         Requires: username and password
@@ -35,7 +35,7 @@ class Authorization():
         )
 
     @router.post("/logout", response_model=APIResponse[dict])
-    def logout(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    async def logout(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
         '''
         Authenticates refresh token and invalidates it by removing it from the db
         Requires: Valid refresh token
@@ -52,7 +52,7 @@ class Authorization():
         )
 
     @router.post("/refresh-token", response_model=APIResponse[Token])
-    def refresh_token(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    async def refresh_token(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
         '''
         Authenticates refresh token and returns new access and refresh token and saves refresh token in db
         Requires: Valid refresh token

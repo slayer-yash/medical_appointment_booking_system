@@ -20,7 +20,7 @@ class Prescription():
     router = APIRouter(prefix="/prescriptions", tags=["Prescription"])
 
     @router.post("/{appointment_id}", response_model=APIResponse[PrescriptionResponseSchema])
-    def add_patient_prescription(
+    async def add_patient_prescription(
         appointment_id: UUID,
         token: Annotated[str, Depends(oauth2_scheme)],
         prescription: UploadFile = File(...),
@@ -40,7 +40,7 @@ class Prescription():
 
 
     @router.get("/patient/{patient_id}", response_model=APIResponse[list[PrescriptionURLResponseSchema]])
-    def get_patient_prescriptions(
+    async def get_patient_prescriptions(
         patient_id: UUID,
         db: Session = Depends(get_db)
     ):
@@ -57,7 +57,7 @@ class Prescription():
         )
 
     @router.get("/{prescription_id}", response_model=APIResponse[PrescriptionURLResponseSchema])
-    def get_prescription(
+    async def get_prescription(
         prescription_id: UUID,
         db: Session = Depends(get_db)
     ):
@@ -74,7 +74,7 @@ class Prescription():
         )
 
     @router.get("/", response_model=APIResponse[list[PrescriptionURLResponseSchema]])
-    def get_all_prescription(
+    async def get_all_prescription(
         db: Session = Depends(get_db),
         search: str = None,
         filters: str = None,

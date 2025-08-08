@@ -18,7 +18,7 @@ class Registration:
     router = APIRouter(tags=["Registration"])
 
     @router.post("/doctor", response_model=APIResponse[UserDoctorResponseSchema])
-    def register_doctor(user: UserDoctorCreateSchema, db: Session = Depends(get_db)):
+    async def register_doctor(user: UserDoctorCreateSchema, db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
         Saves aws profile_photo key in db
@@ -45,7 +45,7 @@ class Registration:
 
 
     @router.post("/patient", response_model=APIResponse[UserResponseSchema])
-    def register_patient(user:UserCreateSchema , db: Session = Depends(get_db)):
+    async def register_patient(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
         Saves aws profile_photo key in db
@@ -71,7 +71,7 @@ class Registration:
         )
 
     @router.post("/nurse", response_model=APIResponse[UserResponseSchema])
-    def register_nurse(user:UserCreateSchema , db: Session = Depends(get_db)):
+    async def register_nurse(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
         Creates user with role='customer' and uploads profile_photo on aws s3 bucket
         Saves aws profile_photo key in db

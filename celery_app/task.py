@@ -23,6 +23,10 @@ c_app.conf.beat_schedule={
         'task': 'celery_app.report_task.generate_weekly_appointment_report',
         'schedule': crontab(hour=8, minute=0, day_of_week=5),
         # 'schedule': 60.0,
+    },
+    'generate-future-doctor-slots': {
+        'task': 'celery_app.doctor_slots.generate_future_doctor_slots',
+        'schedule': crontab(hour=8, minute=0)
     }
 }
 
@@ -57,3 +61,4 @@ def send_mail(to_mail, subject, body, appointment_id):
         logger.error(f"Error during updating is_mail_sent field in database")
 
 from celery_app import report_task
+from celery_app import doctor_slots

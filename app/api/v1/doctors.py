@@ -26,7 +26,7 @@ class Doctor():
     router = APIRouter(prefix="/doctors", tags=["Doctor"])
 
     @router.get("/slots", response_model=APIResponse[list[AvailableDoctorResponseSchema]])
-    def get_doctors_slots(
+    async def get_doctors_slots(
         db: Session = Depends(get_db),
         search: str = None,
         filters: str = None,
@@ -52,7 +52,7 @@ class Doctor():
 
 
     @router.get("/", response_model=APIResponse[list[DoctorResponseSchema]])
-    def get_all_doctors(
+    async def get_all_doctors(
         db: Session = Depends(get_db),
         search: str = None,
         filters: str = None,
@@ -77,7 +77,7 @@ class Doctor():
         )
 
     @router.get("/{doctor_id}/available_slots", response_model=APIResponse[list[AvailableSlotResponseSchema]])
-    def get_doctor_available_slot_by_id(
+    async def get_doctor_available_slot_by_id(
         doctor_id: UUID,
         token: Annotated[str, Depends(oauth2_scheme)],
         date_filter: DateFilterSchema = Depends(),

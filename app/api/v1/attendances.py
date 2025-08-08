@@ -19,7 +19,7 @@ class Attendance():
     router = APIRouter(prefix="/attendances", tags=["Attendance"])
 
     @router.post("/time_in", response_model=APIResponse[AttendanceResponseSchema])
-    def user_attendance_time_in(
+    async def user_attendance_time_in(
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
@@ -36,7 +36,7 @@ class Attendance():
         )
 
     @router.post("/time_out", response_model=APIResponse[AttendanceResponseSchema])
-    def user_attendance_time_out(
+    async def user_attendance_time_out(
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session =Depends(get_db)
     ):
