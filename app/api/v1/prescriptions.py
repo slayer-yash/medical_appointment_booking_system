@@ -75,16 +75,25 @@ class Prescription():
 
     @router.get("/", response_model=APIResponse[list[PrescriptionURLResponseSchema]])
     def get_all_prescription(
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        search: str = None,
+        filters: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        limit: int = 5,
     ):
-        logger.info(f"Get/prescriptions/prescription_id API accessed")
+        logger.info(f"Get/prescriptions/ API accessed")
 
+        allowed_fields = ['doctor_id', 'patient_id', 'appointment_id']
         obj = PrescriptionServices(db, PrescriptionModel)
-        records = obj.fetch_all_prescriptions()
+        records, total_records = obj.fetch_all_prescriptions(filters, sort_by, sort_order, page, limit, allowed_fields, search)
 
         return APIResponse[list[PrescriptionURLResponseSchema]](
             success=True,
             status_code=status.HTTP_200_OK,
             message=f"All prescriptions fetched",
-            data=records
+            data=records,
+            total_records=total_records,
+            current_page=page
         )

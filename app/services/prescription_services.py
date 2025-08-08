@@ -6,6 +6,7 @@ from app.models.patients import Patient
 from app.models.appointments import Appointment
 from app.models.prescriptions import Prescription
 from app.models.users import User
+from app.services.filter_pagination_services import FilterPaginationService
 from app.schemas.prescriptions import PrescriptionURLResponseSchema
 from app.utils.logging import Logging
 from app.utils.helper import get_payload
@@ -118,16 +119,26 @@ class PrescriptionServices(BasicServices):
 
         return prescription
 
-    def fetch_all_prescriptions(self):
+    def fetch_all_prescriptions(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
         logger.info(f"fetch_all_prescriptions method called")
 
-        prescriptions = super().get_all_records()
+        records = None
+        search_filters = None
+        if search:
+            logger.debug(f"Search term provided: '{search.strip()}'")
+            records, search_filters = super().search_record(search.strip())
+
+        obj = FilterPaginationService(self.model, allowed_fields, self.db)
+        records, total_records= obj.apply_filter_pagination(filters, sort_by, sort_order, page, limit, records, search_filters)
+        logger.info(f"Records fetched for {self.model.__name__}")
+
         modified_prescriptions = []
 
-        for prescription in prescriptions:
+        for prescription in records:
             new_prescription = self.get_presighned_url(prescription, PrescriptionURLResponseSchema)
             modified_prescriptions.append(new_prescription)
 
-        return modified_prescriptions
+        return modified_prescriptions, total_records
+        
         
         
