@@ -23,13 +23,18 @@ logger = Logging(__name__).get_logger()
 
 class AppointmentServices(BasicServices):
     '''
-    authorization services available, such as authenticate user, generate tokens, refresh tokens
+    Appointment related services : book_appointment, cancel_appointment, fetch_appointments
     '''
     def __init__(self, db, model):
         super().__init__(db, model)
 
 
     def book_patient_appointment(self, token, slot_id):
+        """
+        Checks slot if available or not and then creates appointment
+        requires: token and slot_id
+        returns: appointment object
+        """
         logger.info(f"book_patient_appointment method called")
 
         try:
@@ -65,18 +70,17 @@ class AppointmentServices(BasicServices):
 
         
             logger.info(f"Attempting to add appointment to database")
-            self.db.add(appointment)
+            appointment = super().add_record_object_to_db(appointment)
             logger.info(f"Appointment added to database")
 
             logger.info(f"Attempting to set slot object is_booked to True and adding notes")
             slot.is_booked = True
             slot.notes = f"Appointment booked by user : {user_id}"
             logger.info(f"slot object updated")
-            
-            self.db.commit()
-            self.db.refresh(appointment)
-            logger.info(f"Refreshing the appointment object")
 
+            super().records_modified(slot, uuid_user_id)
+
+            '''sending mail to user on successful appointment booking'''
             send_mail.apply_async((
                 user.email,
                 "Appointment booked ",
@@ -94,6 +98,8 @@ class AppointmentServices(BasicServices):
             raise HTTPException(500, f"Error occured during adding appointment to database")
 
     def validate_slot_for_appointment_booking(self, slot):
+        '''function to check if the given slot is available and if the slot time
+        is not in the past'''
         logger.info(f"validate_slot_for_appointment_booking method called")
 
         self.check_available_slot(slot)
@@ -103,6 +109,7 @@ class AppointmentServices(BasicServices):
             )
     
     def check_available_slot(self, slot):
+        '''checks and raises exception if given slot is not already booked'''
         logger.info(f"check_available_slot method called")
         if slot.is_booked:
             logger.error(f"Slot is already booked, slot: {slot}")
@@ -111,6 +118,8 @@ class AppointmentServices(BasicServices):
             )
 
     def check_slot_time_not_in_past(self, slot):
+        '''function that checks and converts slot timezone for comparision 
+        and returns true if the slot time is in the past'''
         logger.info(f"Checking if slot start_time is not in the past")
         current_time = datetime.now(ist_timezone)
         if slot.start_time.tzinfo is None or slot.start_time.tzinfo.utcoffset(slot.start_time) is None:
@@ -122,6 +131,9 @@ class AppointmentServices(BasicServices):
             return True
         
     def cancel_patient_appointment(self, token, appointment_id):
+        '''canceles the appointment and updates the appointment slot to avaialble
+        if the appointment slot was in the future
+        '''
         logger.info(f"cancel_patient_appointment method called")
 
         try:
@@ -151,10 +163,9 @@ class AppointmentServices(BasicServices):
 
             appointment.slot.is_booked = False
             appointment.slot.notes = "appointment cancelled"
-            
 
-            self.db.commit()
-            self.db.refresh(appointment)
+            appointment = super().records_modified(appointment, uuid_user_id)
+            slot = super().records_modified(appointment.slot, uuid_user_id)
             
             return appointment
 
@@ -165,6 +176,8 @@ class AppointmentServices(BasicServices):
             raise HTTPException(f"Error during canceling patient appointment")
 
     def fetch_user_appointments_history(self, token, filters, sort_by, sort_order, page, limit, allowed_fields, search=None):
+        '''fetches past records of appointment based on the user_id stored in the token and then applies
+        filter and pagination '''
         logger.info(f"fetch_user_appointments_history method started")
         
         payload = get_payload(token)
@@ -204,6 +217,7 @@ class AppointmentServices(BasicServices):
 
 
     def fetch_user_appointments_upcoming(self, token, filters, sort_by, sort_order, page, limit, allowed_fields, search=None):
+        '''fetches appointmetns for the logged in user and applies filter and pagination'''
         logger.info(F"fetch_user_appointments_upcoming method started")
         
         payload = get_payload(token)
@@ -232,8 +246,17 @@ class AppointmentServices(BasicServices):
 
         return records, total_records
         
-    def update_user_appointment_status(self, appointment_id, status):
+    def update_user_appointment_status(self, token, appointment_id, status):
+        '''checks the status of the appointment if already cancelled, raises exception
+        if status is set to completed but the time slot is in the future raises exception
+        Requires: appointment_id: UUID and status:str'''
         logger.info(f"update_user_appointment_status method started")
+
+        payload = get_payload(token)
+        logger.debug(f"payload received: {payload}")
+        
+        user_id = payload.get('user_id')
+        uuid_user_id = uuid.UUID(user_id) 
 
         appointment = super().get_record_by_id(appointment_id)
         logger.debug(f"appointment: {appointment}")
@@ -256,13 +279,13 @@ class AppointmentServices(BasicServices):
         appointment.status = status
 
         logger.info(f"Attempting to update changes in the database")
-        self.db.commit()
-        self.db.refresh(appointment)
+        appointment = super().records_modified(appointment, uuid_user_id)
         logger.info(f"Changes updated in the database")
 
         return appointment
 
     def fetch_all_appointments(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
+        '''fetches all appointments and applies filter and pagination'''
         logger.info(f"fetch_all_appointments method called")
 
         records = None

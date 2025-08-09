@@ -67,7 +67,7 @@ class AuthServices(BasicServices):
             logger.info(f"Token generated successfully for user: {user.username}")
 
             user.refresh_token = refresh_token
-            self.db.commit()
+            user = super().records_modified(user, user.id)
             logger.info(f"Refresh token stored in database")
             
             return Token(

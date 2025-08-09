@@ -25,6 +25,10 @@ class DoctorSlots():
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
+        '''
+        returns available slots records for current logged in user
+        role: 'doctor'
+        '''
         logger.info(f"GET/doctor_slots/me API accessed")
         logger.debug(f"Token: {token}")
 
@@ -48,6 +52,11 @@ class DoctorSlots():
         slot_update: SlotUpdateSchema,
         db: Session = Depends(get_db)
     ):
+        '''
+        updates available slots records for current logged in user for specified slot
+        requires: slot_id, update parameters as notes 
+        role: 'doctor'
+        '''
         logger.info(f"Patch/doctor_slots/me API accessed")
         logger.debug(f"Token: {token}")
 

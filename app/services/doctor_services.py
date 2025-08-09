@@ -24,6 +24,7 @@ class DoctorServices(BasicServices):
         super().__init__(db, model)
 
     def create_doctor_profile(self, user: BaseModel):
+        '''creates doctor object after user creation and then creates doctor_slots of doctor'''
         logger.info(f"create_doctor_profile method started")
         user_data = {**user.model_dump()}
         speciality = user_data['speciality']
@@ -41,9 +42,8 @@ class DoctorServices(BasicServices):
         logger.debug(f"Doctor profile created: {doctor}")
         
         logger.info(f"Attempting to add doctor profile to database")
-        self.db.add(doctor)
-        self.db.commit()
-        self.db.refresh(doctor)
+        doctor = super().add_record_object_to_db(doctor)
+
         logger.info(f"doctor profile added to database")
 
         self.create_doctor_available_slots(doctor)
@@ -51,6 +51,9 @@ class DoctorServices(BasicServices):
         return new_user
 
     def create_doctor_available_slots(self, doctor, slot_start_time=10, slot_end_time=18):
+        '''
+        generates doctor available slots for 5 days from date of registration
+        '''
         current_day = datetime.now(ist_timezone).replace(minute=0, second=0)
         end_day = current_day+timedelta(days=5)
         start_day = current_day
@@ -80,6 +83,9 @@ class DoctorServices(BasicServices):
         return slots
     
     def fetch_doctors(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
+        '''
+        fetches all records for doctor model and implements search and filtering based on filter parameters
+        '''
         logger.info(f"fetch_doctors method called")
         
         # if role != 'patient':

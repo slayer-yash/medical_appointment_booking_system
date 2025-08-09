@@ -33,8 +33,12 @@ class Doctor():
         sort_by: str = None,
         sort_order: str = 'asc',
         page: int = 1,
-        limit: int = 5,
+        limit: int = 5
     ):
+        '''
+        fetches doctors records with slots details and implements search and filters
+        role: 'patient'
+        '''
         logger.info(f"Get/doctors/slots api called")
 
         allowed_fields = ['speciality', 'id']
@@ -61,6 +65,10 @@ class Doctor():
         page: int = 1,
         limit: int = 5,
     ):
+        '''
+        returns all doctors records
+        role: 'patient', 'doctor', 'nurse'
+        '''
         logger.info(f"Get/doctors/ api called")
 
         allowed_fields = ['speciality', 'id']
@@ -83,6 +91,10 @@ class Doctor():
         date_filter: DateFilterSchema = Depends(),
         db: Session = Depends(get_db)
     ):
+        '''
+        returns specified doctor's available slots and facilitates date range filters
+        role: 'patient'
+        '''
         logger.info(f"GET/doctors/{doctor_id}/available_slots API accessed")
 
         obj = DoctorSlotServices(db, DoctorSlot)

@@ -1,5 +1,6 @@
 from app.config.search_parameters import search_parameters
 from app.utils.logging import Logging
+from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from sqlalchemy import String
@@ -22,7 +23,6 @@ class SearchService():
         model_config = search_parameters.get(self.model)
         if not model_config:
             logger.warning(f"No search configuration found for model: {self.model}")
-            # raise SearchConfigMissingException(str(self.model))
 
         records = self.db.query(self.model)
         filters = []
@@ -36,7 +36,7 @@ class SearchService():
                     logger.debug(f"Search filter added for self field: {column}")
             except AttributeError:
                 logger.warning(f"Invalid self field: {column}")
-                # raise InvalidSearchFieldException(column)
+                raise HTTPException(500, "search column field is invalid: {column}")
 
         for rel_attr_name, rel_fields in model_config['relationships'].items():
             try:
@@ -53,10 +53,10 @@ class SearchService():
                             logger.debug(f"Search filter added for related field: {rel_attr_name}.{column}")
                     except AttributeError:
                         logger.warning(f"Invalid related field: {rel_attr_name}.{column}")
-                        # raise InvalidSearchFieldException(f"{rel_attr_name}.{column}")
+                        HTTPException(500, f"Search parameter relation field is invalild :{rel_attr_name}.{column} ")
             except AttributeError:
                 logger.warning(f"Invalid relationship attribute: {rel_attr_name}")
-                # raise InvalidSearchFieldException(rel_attr_name)
+                HTTPException(500, f"Invalid relationship attribute: {rel_attr_name}")
 
         # records = records.filter(or_(*filters)).distinct()
         search_filters = filters

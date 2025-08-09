@@ -109,6 +109,7 @@ class Appointment():
 
     @router.patch("/{id}", response_model=APIResponse[AppointmentResponseSchema])
     async def update_appointment_status(
+        token: Annotated[str, Depends(oauth2_scheme)],
         appointment_id: UUID,
         updated_status: str,
         db: Session = Depends(get_db)
@@ -116,7 +117,7 @@ class Appointment():
         logger.info(f"Patch/appointments/id API accessed")
 
         obj = AppointmentServices(db, AppointmentModel)
-        record = obj.update_user_appointment_status(appointment_id, updated_status)
+        record = obj.update_user_appointment_status(token, appointment_id, updated_status)
 
         return APIResponse[AppointmentResponseSchema](
             success=True,

@@ -19,6 +19,9 @@ class DoctorSlotServices(BasicServices):
 
 
     def get_doctor_available_slots(self, token):
+        '''
+        returns the doctor_slot records for the logged in user if slot is available
+        '''
         logger.info(f"get_current_patient method called")
         payload = get_payload(token)
 
@@ -40,6 +43,11 @@ class DoctorSlotServices(BasicServices):
         return slots
 
     def update_doctor_slot(self, token, slot_id, slot_update):
+        '''
+        updates the slot object, used in slot booking adds status and notes to slot
+        validates that user is updating his own slots only
+        returns: updated slot record
+        '''
         logger.info(f"update_doctor_slot method called")
         payload = get_payload(token)
 
@@ -63,13 +71,18 @@ class DoctorSlotServices(BasicServices):
             logger.debug(f"field: {field}, value: {value}")
             setattr(slot, field, value)
 
-        self.db.commit()
-        self.db.refresh(slot)
+        slot = super().records_modified(slot, uuid_user_id)
+
         logger.info(f"Doctor slot updated in database.")
         logger.debug(f" Slot: {slot}")
         return slot
 
     def fetch_doctor_available_slots(self, token, doctor_id, date_filter:DateFilterSchema):
+        '''
+        fetches specified doctor available slots and applies filtering 
+        based on daterange filter parameters
+        returns: list of doctor_slot objects
+        '''
 
         logger.info(f"fetch_doctor_available_slots method called")
 

@@ -12,6 +12,7 @@ class NurseServices(BasicServices):
         super().__init__(db, model)
 
     def create_nurse_profile(self, user: BaseModel):
+        '''assignes role 'nurse' to user model and adds record to database'''
         logger.info(f"create_nurse_profile method started")
         user_data = {**user.model_dump()}
 

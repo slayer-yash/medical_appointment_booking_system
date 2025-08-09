@@ -26,6 +26,12 @@ class Prescription():
         prescription: UploadFile = File(...),
         db: Session = Depends(get_db)
     ):
+        '''
+        generates prescriptions for patient
+        requires: appointment_id
+        returns: presciption record
+        role: 'doctor'
+        '''
         logger.info(f"POST/prescriptions/appointment_id API accessed")
 
         obj = PrescriptionServices(db, PrescriptionModel)
@@ -44,6 +50,12 @@ class Prescription():
         patient_id: UUID,
         db: Session = Depends(get_db)
     ):
+        '''
+        fetches patient prescriptions based on patient_id
+        requires: patient_id
+        returns: list of presciptions
+        role: 'nurse', 'doctor'
+        '''
         logger.info(f"Get/prescriptions/patient/patient_id API accessed")
 
         obj = PrescriptionServices(db, PrescriptionModel)
@@ -61,6 +73,10 @@ class Prescription():
         prescription_id: UUID,
         db: Session = Depends(get_db)
     ):
+        '''
+        fetches prescription based on prescription id
+        role: 'nurse', 'doctor'
+        '''
         logger.info(f"Get/prescriptions/prescription_id API accessed")
 
         obj = PrescriptionServices(db, PrescriptionModel)
@@ -83,6 +99,10 @@ class Prescription():
         page: int = 1,
         limit: int = 5,
     ):
+        '''
+        fetches all prescriptions
+        role: 'nurse'
+        '''
         logger.info(f"Get/prescriptions/ API accessed")
 
         allowed_fields = ['doctor_id', 'patient_id', 'appointment_id']

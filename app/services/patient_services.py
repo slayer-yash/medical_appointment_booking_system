@@ -7,6 +7,7 @@ from app.models.users import User
 from app.models.patients import Patient
 from app.utils.logging import Logging
 from app.utils.helper import get_payload
+import uuid
 
 
 logger = Logging(__name__).get_logger()
@@ -16,6 +17,9 @@ class PatientServices(BasicServices):
         super().__init__(db, model)
 
     def create_patient_profile(self, user: BaseModel):
+        '''
+        adds role 'patient' to user and adds record object to database and creates patient record 
+        '''
         logger.info(f"create_patient_profile method started")
         user_data = {**user.model_dump()}
 
@@ -36,6 +40,10 @@ class PatientServices(BasicServices):
         return new_user
 
     def get_current_patient(self, token):
+        '''
+        fetches current logged in patient
+        returns: user object
+        '''
         logger.info(f"get_current_patient method called")
         payload = get_payload(token)
 
@@ -54,8 +62,19 @@ class PatientServices(BasicServices):
 
 
     def update_current_patient(self, token, user_update:BaseModel):
+        '''
+        fetches current logged in patient and updates user model
+        requires: token and user_update model
+        returns: updated patient's user record
+        '''
         logger.info(f"update_current_patient method called")
         user = self.get_current_patient(token)
+
+        payload = get_payload(token)
+
+        logger.debug(f"payload received: {payload}")
+        user_id = payload.get('user_id')
+        uuid_user_id = uuid.UUID(user_id)
 
         try:
             logger.debug(f"Attempting to update patient profile, parameter: token:{token}, user_update: {user_update}")
@@ -63,8 +82,8 @@ class PatientServices(BasicServices):
                 if value:
                     setattr(user, field, value)
 
-            self.db.commit()
-            self.db.refresh(user)
+            user = super().records_modified(user, uuid_user_id)
+
             logger.info(f"Patient profile updated in database.")
             logger.debug(f" User: {user}")
             return user

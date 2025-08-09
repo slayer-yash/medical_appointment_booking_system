@@ -23,6 +23,10 @@ class Attendance():
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
+        '''
+        marks attendance time_in for current logged in user
+        role: 'nurse', 'doctor'
+        '''
         logger.info(f"POST/attendances/time_in API accessed")
 
         obj = AttendanceServices(db, AttendanceModel)
@@ -40,6 +44,10 @@ class Attendance():
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session =Depends(get_db)
     ):
+        '''
+        marks attendance time_out for current logged in user
+        role: 'nurse', 'doctor'
+        '''
         logger.info(f"Post/ attendances/time_out API accessed")
 
         obj = AttendanceServices(db, AttendanceModel)

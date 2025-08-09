@@ -20,9 +20,8 @@ class Registration:
     @router.post("/doctor", response_model=APIResponse[UserDoctorResponseSchema])
     async def register_doctor(user: UserDoctorCreateSchema, db: Session = Depends(get_db)):
         '''
-        Creates user with role='customer' and uploads profile_photo on aws s3 bucket
-        Saves aws profile_photo key in db
-        Requires: unique username, user_email, user_phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
+        Creates user with role='doctor' and doctor record in doctors table
+        Requires: unique username, email, phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
         Returns: Success message with user details in pydantic response.
         '''
         logger.info("POST /registration/doctor called")
@@ -47,9 +46,8 @@ class Registration:
     @router.post("/patient", response_model=APIResponse[UserResponseSchema])
     async def register_patient(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
-        Creates user with role='customer' and uploads profile_photo on aws s3 bucket
-        Saves aws profile_photo key in db
-        Requires: unique username, user_email, user_phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
+        Creates user with role='patient' and patient record in patients table
+        Requires: unique username, email, phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
         Returns: Success message with user details in pydantic response.
         '''
         logger.info("POST /registration/patient called")
@@ -73,9 +71,8 @@ class Registration:
     @router.post("/nurse", response_model=APIResponse[UserResponseSchema])
     async def register_nurse(user:UserCreateSchema , db: Session = Depends(get_db)):
         '''
-        Creates user with role='customer' and uploads profile_photo on aws s3 bucket
-        Saves aws profile_photo key in db
-        Requires: unique username, user_email, user_phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
+        Creates user with role='nurse' 
+        Requires: unique username, email, phone and valid Password with one digit, Uppercase letter, Lowercase letter, special character each.
         Returns: Success message with user details in pydantic response.
         '''
         logger.info("POST /registration/nurse called")

@@ -21,6 +21,12 @@ class PrescriptionServices(BasicServices):
         super().__init__(db, model)
 
     def create_patient_prescription(self, token, appointment_id, prescription):
+        '''
+        creates prescription record for appointments
+        validates only one prescription is generated for an appointment_id,
+        if appointment status is cancelled, restricts generating prescription,
+        store prescription record to database and prescription file to s3 bucket
+        '''
         logger.info(f"create_patient_prescription method called")
         payload = get_payload(token)
 
@@ -68,6 +74,9 @@ class PrescriptionServices(BasicServices):
 
 
     def store_prescription_on_aws(self, prescription, file_name):
+        '''
+        function to store prescription object to s3 bucket
+        '''
         logger.info(f"store_prescription_on_aws method started")
         try:
             logger.info(f"Attempting to upload prescription object to s3 bucket")
@@ -80,6 +89,10 @@ class PrescriptionServices(BasicServices):
             raise HTTPException(500, f"NoCredentialsError occured during file upload to s3")
 
     def fetch_patient_prescriptions(self, patient_id):
+        '''
+        fetches prescription records for specified patient_id and adds presigned url for each record 
+        for accessing prescription file
+        '''
         logger.info(f"fetch_patient_prescriptions method called")
 
         prescriptions = self.db.query(self.model).filter(self.model.patient_id == patient_id).all()
@@ -94,6 +107,9 @@ class PrescriptionServices(BasicServices):
         return modified_prescriptions
 
     def fetch_patient_prescription(self, prescription_id):
+        '''
+        fetches prescirption of specified id and adds presigned url to return record
+        '''
         logger.info(f"fetch_patient_prescription method called")
 
         prescription = super().get_record_by_id(prescription_id)
@@ -104,6 +120,9 @@ class PrescriptionServices(BasicServices):
         return prescription
 
     def get_presighned_url(self, object, pyschema):
+        '''
+        function to generate presigned url for prescition object keys
+        '''
         logger.info(f"get_presighned_url method called")
         
         prescription_out = pyschema.model_validate(object)
@@ -120,6 +139,9 @@ class PrescriptionServices(BasicServices):
         return prescription
 
     def fetch_all_prescriptions(self, filters, sort_by, sort_order, page, limit, allowed_fields, search):
+        '''
+        returns all prescription records and applies filter and pagination, also adds presigned url to each record
+        '''
         logger.info(f"fetch_all_prescriptions method called")
 
         records = None

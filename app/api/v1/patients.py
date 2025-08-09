@@ -26,6 +26,10 @@ class Patient():
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
     ):
+        '''
+        Returns current logged in patient's profile
+        role: 'patient'
+        '''
         logger.info(f"GET/patients/me API accessed")
         obj = PatientServices(db, User)
         record = obj.get_current_patient(token)
@@ -43,6 +47,10 @@ class Patient():
         user:UserUpdateSchema,
         db: Session = Depends(get_db)
     ):
+        '''
+        Updated current logged in patient's profile
+        role: 'patient'
+        '''
         logger.info(f"PATCH/patients/me API accessed")
         obj = PatientServices(db, User)
         record = obj.update_current_patient(token, user)

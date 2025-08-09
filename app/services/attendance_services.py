@@ -25,6 +25,7 @@ class AttendanceServices(BasicServices):
 
 
     def generate_user_attendance(self, token):
+        '''add attendance time_in record to the database'''
         logger.info(f"generate_user_attendance method called")
         payload = get_payload(token)
 
@@ -51,6 +52,8 @@ class AttendanceServices(BasicServices):
         return record
 
     def update_user_timeout(self, token):
+        '''fetches the attendance record of logged in user using token and updates the time_out if 
+        found none else raises exception'''
         logger.info(f"update_user_timeout method called")
         payload = get_payload(token)
 

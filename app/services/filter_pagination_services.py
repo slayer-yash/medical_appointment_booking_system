@@ -67,7 +67,7 @@ class FilterPaginationService:
             return records
         except Exception as e:
             logger.exception(f"Error applying filters: {e}")
-            raise HTTPException()
+            raise HTTPException(500, f"Error applying filters: ")
 
     def apply_sorting(self, sort_by, sort_order, records):
         if sort_by is None:
@@ -80,8 +80,8 @@ class FilterPaginationService:
             else:
                 return records.order_by(sort_field.asc())
         except Exception as e:
-            self.logger.exception(f"Error applying sorting: {e}")
-            raise HTTPException()
+            logger.exception(f"Error applying sorting: {e}")
+            raise HTTPException(500, "Error applying sorting")
 
     def verify_filters(self, filters, sort_by, sort_order, page, limit):
         if filters:
@@ -89,23 +89,23 @@ class FilterPaginationService:
             for filter in filters:
                 filter_parts = filter.split("-")
                 if len(filter_parts) != 3:
-                    raise HTTPException(filter)
+                    raise HTTPException(400, f"filter parameters needs to be in format field-operator-value, input filter: {filter}")
 
                 field, condition, value = filter_parts
                 if field.strip() not in self.allowed_fields:
-                    raise HTTPException(field, self.allowed_fields)
+                    raise HTTPException(400, f"invalid field in filter parameter, field:{field}, allowed_fields: {self.allowed_fields}")
 
                 if condition == 'like' and not isinstance(value, str):
-                    raise HTTPException()
+                    raise HTTPException(400, f"like operator requires a string value, input value: {value}")
 
         if sort_by and sort_by not in self.allowed_fields:
-            raise HTTPException(sort_by, self.allowed_fields)
+            raise HTTPException(400, f"invalid field in sort_by parameter, input sort_by: {sort_by}, allowed_fields: {self.allowed_fields}")
 
         if sort_order not in ["asc", "desc"]:
-            raise HTTPException()
+            raise HTTPException(400, f"sort order must be either 'asc' or 'desc', input sort_order: {sort_order}")
 
         if page < 1:
-            raise HTTPException()
+            raise HTTPException(400, f"page must be a positive integer, input page: {page}")
 
         if limit < 1 or limit > 100:
-            raise HTTPException()
+            raise HTTPException(400, f"limit must be an integer between 1 and 100, input limit: {limit}")

@@ -36,6 +36,8 @@ class BasicServices(SearchService):
             raise HTTPException(500, f"Error while adding record to database: {e}")
 
     def add_records(self, models: list[Base_Model]):
+        '''adds multiple records to the database,
+        requires: list of sql objects'''
         try:
             self.db.add_all(models)
             self.db.commit()
@@ -56,6 +58,7 @@ class BasicServices(SearchService):
         return record
 
     def get_all_records(self):
+        '''fetches all records of the self.model model'''
 
         logger.info(f"get_all_records called for model: {self.model}")
         records = self.db.query(self.model).all()
@@ -64,6 +67,7 @@ class BasicServices(SearchService):
         return records
 
     def add_record_object_to_db(self, record):
+        '''adds single record to database'''
         logger.info(f"add_record_object_to_db method called")
 
         try:
@@ -78,6 +82,10 @@ class BasicServices(SearchService):
             raise HTTPException(500, "Error during adding record object to database")
 
     def get_record_by_model_id(self, sql_model, request_id):
+        '''fetches the record by id for the specified model
+        requires: model class, request_id
+        returns: record object
+        '''
         logger.info(f"get_record_by_model_id method called")
 
         record = self.db.query(sql_model).filter(sql_model.id == request_id).first()
@@ -88,6 +96,7 @@ class BasicServices(SearchService):
         return record
 
     def get_records_by_field(self, field, value):
+        '''fetches the record by specified field and value'''
         logger.info(f"get_record_by_field method called")
 
         records = self.db.query(self.model).filter(self.model.field == value).all()

@@ -71,7 +71,7 @@ class RBACMiddleware(BaseHTTPMiddleware):
 
             access_granted = False
             for end_point in end_points:
-                if fnmatch(request_endpoint, end_point.endpoint):
+                if fnmatch(request_endpoint, end_point.endpoint):  #To match the endpoint stored pattern
                     access_granted = True
 
             if not access_granted:
